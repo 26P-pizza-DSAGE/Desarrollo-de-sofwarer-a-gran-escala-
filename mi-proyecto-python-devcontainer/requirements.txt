@@ -1,1 +1,0 @@
-# Agrega tus dependencias de Python aquí (ej. requests, pandas)

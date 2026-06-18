@@ -1,6 +1,6 @@
 {
   "name": "Flutter Dev Container",
-  "image": "ghcr.io/cirruslabs/flutter:stable",
+  "image": "instrumentisto/flutter:latest",
   "features": {},
   "postCreateCommand": "/bin/sh -c 'flutter pub get'",
   "customizations": {
