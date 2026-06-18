@@ -15,8 +15,8 @@ class MyApp extends StatelessWidget {
       title: 'Pizza App',
       initialRoute: '/',
       routes: {
-        '/': (context) => RegistroScreen(),
-        '/home': (context) => const MyHomePage(title: 'Inicio'),
+        '/': (context) => const MyHomePage(title: 'Inicio'),
+        '/sign-up': (context) => RegistroScreen(),
       },
 
       theme: ThemeData(
@@ -80,6 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/sign-up');
+              },
+              child: const Text('Crear cuenta'),
             ),
           ],
         ),
