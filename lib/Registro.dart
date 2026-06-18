@@ -10,7 +10,7 @@ class RegistroScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF182230)),
+          icon: const Icon(Icons.chevron_left, color: Color(0xFF182230)),
           onPressed: () {
             Navigator.pop(context, '/');
           },
