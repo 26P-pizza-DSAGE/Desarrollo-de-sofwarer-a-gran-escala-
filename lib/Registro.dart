@@ -184,7 +184,9 @@ class RegistroScreen extends StatelessWidget {
                       SizedBox(
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/home');
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF2E6CF6),
                             foregroundColor: Colors.white,
