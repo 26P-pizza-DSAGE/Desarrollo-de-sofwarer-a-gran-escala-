@@ -1,6 +1,71 @@
 import 'package:flutter/material.dart';
 
-class RegistroScreen extends StatelessWidget {
+class RegistroScreen extends StatefulWidget {
+  const RegistroScreen({super.key});
+
+  @override
+  State<RegistroScreen> createState() => _RegistroScreenState();
+}
+
+class _RegistroScreenState extends State<RegistroScreen> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  final RegExp _emailRegExp = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
+  bool _isFormValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.addListener(_validateForm);
+    _emailController.addListener(_validateForm);
+    _passwordController.addListener(_validateForm);
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _validateForm() {
+    final bool isValid =
+        _usernameController.text.trim().length >= 3 &&
+        _emailRegExp.hasMatch(_emailController.text.trim()) &&
+        _passwordController.text.length >= 6;
+
+    if (_isFormValid != isValid) {
+      setState(() {
+        _isFormValid = isValid;
+      });
+    }
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: const Color(0xFFF8FAFD),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Color(0xFFD9E2EF)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Color(0xFFD9E2EF)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Color(0xFF4C7DF0), width: 1.6),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,105 +153,33 @@ class RegistroScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       TextField(
-                        decoration: InputDecoration(
-                          labelText: 'Nombre de usuario',
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFD),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9E2EF),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9E2EF),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF4C7DF0),
-                              width: 1.6,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 18,
-                          ),
-                        ),
+                        controller: _usernameController,
+                        textInputAction: TextInputAction.next,
+                        decoration: _inputDecoration('Nombre de usuario'),
                       ),
                       const SizedBox(height: 16),
                       TextField(
-                        decoration: InputDecoration(
-                          labelText: 'Correo electrónico',
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFD),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9E2EF),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9E2EF),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF4C7DF0),
-                              width: 1.6,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 18,
-                          ),
-                        ),
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        decoration: _inputDecoration('Correo electrónico'),
                       ),
                       const SizedBox(height: 16),
                       TextField(
+                        controller: _passwordController,
                         obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Contraseña',
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFD),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9E2EF),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFD9E2EF),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF4C7DF0),
-                              width: 1.6,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 18,
-                          ),
-                        ),
+                        textInputAction: TextInputAction.done,
+                        decoration: _inputDecoration('Contraseña'),
                       ),
                       const SizedBox(height: 28),
                       SizedBox(
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/home');
-                          },
+                          onPressed: _isFormValid
+                              ? () {
+                                  Navigator.pushNamed(context, '/home');
+                                }
+                              : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF2E6CF6),
                             foregroundColor: Colors.white,
