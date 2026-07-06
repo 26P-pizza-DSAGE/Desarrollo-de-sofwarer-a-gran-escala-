@@ -25,7 +25,7 @@ class LoginView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // Campo de Contraseña
+            // Campo de ContraseñaDo  
             const TextField(
               obscureText: true,
               decoration: InputDecoration(
@@ -33,7 +33,8 @@ class LoginView extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 30)
+            ,
             // Botón de Ingresar
             ElevatedButton(
               onPressed: () {
