@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dsage/db/helpers/user.dart';
 import 'package:dsage/db/model/user.dart';
 import 'package:dsage/services/auth_service.dart';
@@ -65,6 +67,84 @@ class _InicioScreenState extends State<InicioScreen> {
     await AuthService.clearSession();
     if (!mounted) return;
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
+
+  Widget _buildPizzaCard(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+    String pizzaName,
+    String pizzaDescription,
+    double pizzaPrice,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/pizza_details',
+          arguments: {
+            'name': pizzaName,
+            'description': pizzaDescription,
+            'price': pizzaPrice,
+          },
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: colorScheme.outlineVariant),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(60),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              pizzaName,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              pizzaDescription,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Precio: \$${pizzaPrice.toStringAsFixed(2)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+              ),
+            ),
+
+            const Spacer(),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  '/order_pizza',
+                  arguments: pizzaName,
+                );
+              },
+              icon: const Icon(Icons.shopping_cart_outlined),
+              label: const Text('Ordenar'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -212,20 +292,164 @@ class _InicioScreenState extends State<InicioScreen> {
           const SizedBox(height: 32),
 
           Text(
-            'Menú',
+            'Arma tu pizza',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 12),
-          Center(
-            child: Text(
-              'catálogo de pizzas',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+          // banner promocional de pizzas personalizadas
+          const SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withAlpha(30),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outlineVariant),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(60),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
+            child: Column(
+              children: [
+                Text(
+                  '¡Crea tu pizza personalizada!',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Elige tus ingredientes favoritos y crea la pizza perfecta para ti.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/custom_pizza');
+                  },
+                  icon: const Icon(Icons.add_circle_outline),
+                  label: const Text('Crear Pizza'),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+          // pizza recomendada del día
+          Text(
+            'Pizza recomendada del día',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: colorScheme.secondary.withAlpha(30),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: colorScheme.outlineVariant),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(60),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'Pizza del día: Margarita',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Disfruta de nuestra pizza Margarita, con salsa de tomate, queso mozzarella y albahaca fresca. ¡Una opción clásica y deliciosa!',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/order_pizza',
+                      arguments: 'Margarita',
+                    );
+                  },
+                  icon: const Icon(Icons.shopping_cart_outlined),
+                  label: const Text('Ordenar Pizza'),
+                ),
+              ],
+            ),
+          ),
+          // Seccion para pizzas populares (listado en cuadricula con check para ver mas detalles de cada pizza y boton para ordenar)
+          const SizedBox(height: 32),
+          Text(
+            'Pizzas populares',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 24),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            children: [
+              _buildPizzaCard(
+                context,
+                theme,
+                colorScheme,
+                'Pepperoni',
+                'Salsa de tomate, queso mozzarella y pepperoni.',
+                190.00,
+              ),
+              _buildPizzaCard(
+                context,
+                theme,
+                colorScheme,
+                'Hawaiana',
+                'Salsa de tomate, queso mozzarella, jamón y piña.',
+                200.00,
+              ),
+              _buildPizzaCard(
+                context,
+                theme,
+                colorScheme,
+                'Cuatro Quesos',
+                'Salsa de tomate, mozzarella, gorgonzola, parmesano y ricotta.',
+                249.00,
+              ),
+              _buildPizzaCard(
+                context,
+                theme,
+                colorScheme,
+                'Vegetariana',
+                'Salsa de tomate, queso mozzarella y variedad de vegetales.',
+                179.00,
+              ),
+            ],
           ),
         ],
       ),
