@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dsage/Realizar_pago_del_pedido.dart';
+import 'package:dsage/realizar_pago_del_pedido.dart';
 
 /// Ejemplo de cómo usar la pantalla de pago
 ///
