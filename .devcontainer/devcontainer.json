@@ -2,7 +2,7 @@
   "name": "Flutter Dev Container",
   "image": "instrumentisto/flutter:latest",
   "features": {},
-  "postCreateCommand": "sudo mkdir -p /usr/lib/llvm-18/bin && sudo ln -sf /usr/bin/ar /usr/lib/llvm-18/bin/ar && sudo ln -sf /usr/bin/ld.lld /usr/lib/llvm-18/bin/ld.lld && /bin/sh -c 'flutter pub get'",
+  "postCreateCommand": "sudo mkdir -p /usr/lib/llvm-18/bin && sudo ln -sf /usr/bin/ar /usr/lib/llvm-18/bin/ar && if [ -e /usr/bin/ld.lld ]; then sudo ln -sf /usr/bin/ld.lld /usr/lib/llvm-18/bin/ld.lld; fi && sudo ln -sf /usr/bin/ld /usr/lib/llvm-18/bin/ld && /bin/sh -c 'flutter pub get'",
   "customizations": {
     "vscode": {
       "settings": {
