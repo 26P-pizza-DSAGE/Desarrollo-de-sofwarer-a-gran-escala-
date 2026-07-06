@@ -417,7 +417,10 @@ class _PagoScreenState extends State<PagoScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 14, color: color ?? Colors.grey),
+          style: TextStyle(
+            fontSize: 14,
+            color: color ?? AppTheme.onSurfaceVariant,
+          ),
         ),
         Text(
           '\$${amount.toStringAsFixed(2)}',
@@ -895,7 +898,7 @@ class _PagoScreenState extends State<PagoScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: getStatusColor(transaction.status).withOpacity(0.2),
+              color: getStatusColor(transaction.status).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -921,7 +924,10 @@ class _PagoScreenState extends State<PagoScreen> {
                 ),
                 Text(
                   DateFormat('dd/MM/yyyy HH:mm').format(transaction.date),
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
