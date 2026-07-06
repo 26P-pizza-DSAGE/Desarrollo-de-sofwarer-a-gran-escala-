@@ -1,8 +1,23 @@
 import 'package:dsage/Inicio.dart';
 import 'package:dsage/Registro.dart';
+import 'package:dsage/db/helpers/user.dart';
+import 'package:dsage/services/auth_service.dart';
+import 'package:dsage/theme/app_theme.dart';
+import 'package:dsage/views/login_view.dart';
+import 'package:dsage/views/splash_view.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  await Future.wait([
+    Hive.openBox(UserRepository.boxName),
+    Hive.openBox(AuthService.boxName),
+  ]);
+
   runApp(const MyApp());
 }
 
@@ -12,70 +27,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pizza App',
+      title: 'Pizza Builder',
+      theme: AppTheme.dark,
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => const MyHomePage(title: 'Inicio'),
-        '/sign-up': (context) => RegistroScreen(),
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginView(),
+        '/sign-up': (context) => const RegistroScreen(),
         '/home': (context) => const InicioScreen(),
       },
-
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/sign-up');
-              },
-              child: const Text('Crear cuenta'),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
