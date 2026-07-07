@@ -1,4 +1,5 @@
 import 'package:dsage/shared/model/pizza.dart';
+import 'package:dsage/core/config/app_constants.dart';
 import 'package:dsage/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -48,6 +49,9 @@ class _PagoScreenState extends State<PagoScreen> {
   PaymentStatus paymentStatus = PaymentStatus.pending;
   bool showBillingForm = false;
   bool showTransactionHistory = false;
+  final TextEditingController discountCodeController = TextEditingController();
+  String? appliedDiscountCode;
+  double appliedDiscountAmount = 0.0;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -62,11 +66,12 @@ class _PagoScreenState extends State<PagoScreen> {
   @override
   void initState() {
     super.initState();
+    discountCodeController.addListener(_handleDiscountCodeChanged);
     transactionHistory = [
       Transaction(
         id: 'TRX-001-${widget.orderId}',
         date: DateTime.now().subtract(const Duration(days: 1)),
-        amount: widget.subtotal + widget.tax + widget.shippingCost,
+        amount: total,
         status: PaymentStatus.confirmed,
         method: PaymentMethod.card,
       ),
@@ -75,6 +80,8 @@ class _PagoScreenState extends State<PagoScreen> {
 
   @override
   void dispose() {
+    discountCodeController.removeListener(_handleDiscountCodeChanged);
+    discountCodeController.dispose();
     nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
@@ -85,7 +92,88 @@ class _PagoScreenState extends State<PagoScreen> {
     super.dispose();
   }
 
-  double get total => widget.subtotal + widget.tax + widget.shippingCost;
+  double get subtotalWithTaxesAndShipping =>
+      widget.subtotal + widget.tax + widget.shippingCost;
+
+  double get total => (subtotalWithTaxesAndShipping - appliedDiscountAmount)
+      .clamp(0.0, subtotalWithTaxesAndShipping);
+
+  void _handleDiscountCodeChanged() {
+    if (discountCodeController.text.trim().isNotEmpty) {
+      return;
+    }
+
+    if (appliedDiscountAmount == 0.0 && appliedDiscountCode == null) {
+      return;
+    }
+
+    setState(() {
+      appliedDiscountCode = null;
+      appliedDiscountAmount = 0.0;
+    });
+  }
+
+  void _applyDiscountCode() {
+    final String code = discountCodeController.text.trim().toUpperCase();
+
+    if (appliedDiscountAmount > 0) {
+      setState(() {
+        appliedDiscountCode = null;
+        appliedDiscountAmount = 0.0;
+      });
+      discountCodeController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Código de descuento eliminado.'),
+          backgroundColor: AppTheme.primaryOrange,
+        ),
+      );
+      return;
+    }
+
+    if (code.isEmpty) {
+      discountCodeController.clear();
+      setState(() {
+        appliedDiscountCode = null;
+        appliedDiscountAmount = 0.0;
+      });
+
+      return;
+    }
+
+    final double? discount = AppConstants.discountCodes[code];
+
+    if (discount == null) {
+      setState(() {
+        appliedDiscountCode = null;
+        appliedDiscountAmount = 0.0;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Código "$code" inválido.',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      appliedDiscountCode = code;
+      appliedDiscountAmount = discount;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Código "$code" aplicado con éxito.'),
+        backgroundColor: AppTheme.accentGreen,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
 
   Color getStatusColor(PaymentStatus status) {
     switch (status) {
@@ -230,9 +318,11 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  // ── Build principal ────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundDark,
       appBar: AppBar(
@@ -248,7 +338,7 @@ class _PagoScreenState extends State<PagoScreen> {
             children: [
               _buildOrderIdCard(),
               const SizedBox(height: 24),
-              _buildOrderSummary(),
+              _buildOrderSummary(cs),
               const SizedBox(height: 24),
               _buildPaymentStatusIndicator(),
               const SizedBox(height: 24),
@@ -301,7 +391,7 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  Widget _buildOrderSummary() {
+  Widget _buildOrderSummary(ColorScheme cs) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -340,6 +430,45 @@ class _PagoScreenState extends State<PagoScreen> {
               ),
             ),
 
+            const SizedBox(height: 16),
+            TextField(
+              controller: discountCodeController,
+              decoration: InputDecoration(
+                labelText: 'Código de Descuento',
+                hintText: 'Ingresa un código válido',
+                suffixIcon: IconButton(
+                  icon: appliedDiscountAmount > 0
+                      ? const Icon(Icons.close)
+                      : const Icon(Icons.check),
+                  onPressed: _applyDiscountCode,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+
+            if (appliedDiscountAmount > 0) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.accentGreen.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.accentGreen),
+                ),
+                child: Text(
+                  'Descuento aplicado (${appliedDiscountCode ?? ''}): -\$${appliedDiscountAmount.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.accentGreen,
+                  ),
+                ),
+              ),
+            ],
+
             const Divider(height: 20),
             _buildSummaryRow('Subtotal', widget.subtotal),
             const SizedBox(height: 8),
@@ -350,6 +479,27 @@ class _PagoScreenState extends State<PagoScreen> {
               widget.shippingCost,
               AppTheme.accentGreen,
             ),
+            if (appliedDiscountAmount > 0) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Descuento',
+                    style: TextStyle(fontSize: 14, color: AppTheme.accentGreen),
+                  ),
+                  Text(
+                    '-\$${appliedDiscountAmount.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.accentGreen,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
             const SizedBox(height: 16),
 
             Container(
