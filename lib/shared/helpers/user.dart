@@ -1,4 +1,4 @@
-import 'package:dsage/db/model/user.dart';
+import 'package:dsage/shared/model/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class UserRepository {

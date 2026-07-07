@@ -1,8 +1,8 @@
-import 'package:dsage/realizar_pago_del_pedido.dart';
+import 'package:dsage/shared/model/pizza.dart';
 
 class PaymentArguments {
   final String orderId;
-  final List<OrderItem> items;
+  final List<Pizza> items;
   final double subtotal;
   final double tax;
   final double shippingCost;
