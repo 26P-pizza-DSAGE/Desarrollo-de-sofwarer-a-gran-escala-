@@ -1,5 +1,5 @@
 import 'package:dsage/features/home/screens/home_screen.dart';
-import 'package:dsage/features/signup/screens/registro_screen.dart';
+import 'package:dsage/features/auth/screens/registro_screen.dart';
 import 'package:dsage/shared/helpers/user.dart';
 import 'package:dsage/shared/model/payment_arguments.dart';
 import 'package:dsage/shared/model/pizza.dart';
