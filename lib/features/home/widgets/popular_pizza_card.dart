@@ -25,7 +25,6 @@ class PopularPizzaCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Imagen con ClipRRect ya cubierto por clipBehavior del Card
             Expanded(
               child: SizedBox(
                 width: double.infinity,

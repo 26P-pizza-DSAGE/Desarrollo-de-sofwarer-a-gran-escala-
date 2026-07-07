@@ -25,7 +25,6 @@ class FeaturedPizzaCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Imagen grande
             SizedBox(
               height: 200,
               width: double.infinity,

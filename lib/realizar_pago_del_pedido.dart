@@ -1,18 +1,11 @@
+import 'package:dsage/shared/model/pizza.dart';
+import 'package:dsage/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:dsage/theme/app_theme.dart';
 
 enum PaymentStatus { pending, processing, confirmed, rejected }
 
 enum PaymentMethod { card, cash }
-
-class OrderItem {
-  final String name;
-  final double price;
-  final int quantity;
-
-  OrderItem({required this.name, required this.price, required this.quantity});
-}
 
 class Transaction {
   final String id;
@@ -32,7 +25,7 @@ class Transaction {
 
 class PagoScreen extends StatefulWidget {
   final String orderId;
-  final List<OrderItem> items;
+  final List<Pizza> items;
   final double subtotal;
   final double tax;
   final double shippingCost;
@@ -56,7 +49,6 @@ class _PagoScreenState extends State<PagoScreen> {
   bool showBillingForm = false;
   bool showTransactionHistory = false;
 
-  // Controllers para formulario
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -65,7 +57,6 @@ class _PagoScreenState extends State<PagoScreen> {
   final TextEditingController expiryController = TextEditingController();
   final TextEditingController cvvController = TextEditingController();
 
-  // Historial de transacciones simulado
   late List<Transaction> transactionHistory;
 
   @override
@@ -80,6 +71,18 @@ class _PagoScreenState extends State<PagoScreen> {
         method: PaymentMethod.card,
       ),
     ];
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
+    cardNumberController.dispose();
+    expiryController.dispose();
+    cvvController.dispose();
+    super.dispose();
   }
 
   double get total => widget.subtotal + widget.tax + widget.shippingCost;
@@ -142,13 +145,11 @@ class _PagoScreenState extends State<PagoScreen> {
       return;
     }
 
-    // Simular procesamiento
     setState(() => paymentStatus = PaymentStatus.processing);
 
     Future.delayed(const Duration(seconds: 2), () {
       setState(() => paymentStatus = PaymentStatus.confirmed);
 
-      // Agregar transacción al historial
       transactionHistory.insert(
         0,
         Transaction(
@@ -223,25 +224,13 @@ class _PagoScreenState extends State<PagoScreen> {
   }
 
   void _goToDeliveryTracking() {
-    // Navegación a pantalla de seguimiento
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Ir a seguimiento de entrega')),
     );
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    addressController.dispose();
-    cardNumberController.dispose();
-    expiryController.dispose();
-    cvvController.dispose();
-    super.dispose();
-  }
-
+  // ── Build principal ────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -253,45 +242,28 @@ class _PagoScreenState extends State<PagoScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Número de Pedido
               _buildOrderIdCard(),
               const SizedBox(height: 24),
-
-              // Resumen del Pedido
               _buildOrderSummary(),
               const SizedBox(height: 24),
-
-              // Estado de Pago
               _buildPaymentStatusIndicator(),
               const SizedBox(height: 24),
-
-              // Métodos de Pago
               _buildPaymentMethodsSection(),
               const SizedBox(height: 24),
-
-              // Formulario de Facturación
               if (showBillingForm) ...[
                 _buildBillingFormSection(),
                 const SizedBox(height: 24),
               ],
-
-              // Mensaje de Seguridad
               _buildSecurityMessage(),
               const SizedBox(height: 24),
-
-              // Botón de Confirmación
               _buildConfirmButton(),
               const SizedBox(height: 24),
-
-              // Botón de Historial
               _buildTransactionHistoryButton(),
               const SizedBox(height: 24),
-
-              // Historial de Transacciones
               if (showTransactionHistory) _buildTransactionHistory(),
             ],
           ),
@@ -343,9 +315,9 @@ class _PagoScreenState extends State<PagoScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            // Productos
-            ...widget.items.map((item) {
-              return Padding(
+
+            ...widget.items.map(
+              (item) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -357,7 +329,7 @@ class _PagoScreenState extends State<PagoScreen> {
                       ),
                     ),
                     Text(
-                      '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                      '\$${item.totalPrice.toStringAsFixed(2)}',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -365,22 +337,21 @@ class _PagoScreenState extends State<PagoScreen> {
                     ),
                   ],
                 ),
-              );
-            }),
+              ),
+            ),
+
             const Divider(height: 20),
-            // Subtotal
             _buildSummaryRow('Subtotal', widget.subtotal),
             const SizedBox(height: 8),
-            // Impuestos
             _buildSummaryRow('Impuestos', widget.tax, AppTheme.primaryOrange),
             const SizedBox(height: 8),
-            // Envío
             _buildSummaryRow(
               'Costo de Envío',
               widget.shippingCost,
               AppTheme.accentGreen,
             ),
             const SizedBox(height: 16),
+
             Container(
               decoration: BoxDecoration(
                 color: AppTheme.primaryOrange.withValues(alpha: 0.12),
@@ -457,13 +428,12 @@ class _PagoScreenState extends State<PagoScreen> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    paymentStatus == PaymentStatus.pending
-                        ? Icons.schedule
-                        : paymentStatus == PaymentStatus.processing
-                        ? Icons.hourglass_empty
-                        : paymentStatus == PaymentStatus.confirmed
-                        ? Icons.check_circle
-                        : Icons.cancel,
+                    switch (paymentStatus) {
+                      PaymentStatus.pending => Icons.schedule,
+                      PaymentStatus.processing => Icons.hourglass_empty,
+                      PaymentStatus.confirmed => Icons.check_circle,
+                      PaymentStatus.rejected => Icons.cancel,
+                    },
                     color: getStatusColor(paymentStatus),
                     size: 32,
                   ),
@@ -483,13 +453,16 @@ class _PagoScreenState extends State<PagoScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        paymentStatus == PaymentStatus.pending
-                            ? 'Esperando confirmación de pago'
-                            : paymentStatus == PaymentStatus.processing
-                            ? 'Tu pago está siendo procesado'
-                            : paymentStatus == PaymentStatus.confirmed
-                            ? 'Tu pago fue confirmado exitosamente'
-                            : 'Hubo un problema con tu pago',
+                        switch (paymentStatus) {
+                          PaymentStatus.pending =>
+                            'Esperando confirmación de pago',
+                          PaymentStatus.processing =>
+                            'Tu pago está siendo procesado',
+                          PaymentStatus.confirmed =>
+                            'Tu pago fue confirmado exitosamente',
+                          PaymentStatus.rejected =>
+                            'Hubo un problema con tu pago',
+                        },
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppTheme.onSurfaceVariant,
@@ -531,104 +504,26 @@ class _PagoScreenState extends State<PagoScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            // Opción Tarjeta
-            _buildPaymentMethodOption(
-              PaymentMethod.card,
-              Icons.credit_card,
-              'Tarjeta de Crédito/Débito',
-              'Visa, Mastercard, American Express',
+            PaymentMethodCard(
+              icon: Icons.credit_card,
+              title: 'Tarjeta de Crédito/Débito',
+              subtitle: 'Visa, Mastercard, American Express',
+              isSelected: selectedPaymentMethod == PaymentMethod.card,
+              onTap: () => setState(() {
+                selectedPaymentMethod = PaymentMethod.card;
+              }),
             ),
             const SizedBox(height: 12),
-            // Opción Efectivo
-            _buildPaymentMethodOption(
-              PaymentMethod.cash,
-              Icons.payments,
-              'Pago en Efectivo',
-              'Al momento de la entrega',
+            PaymentMethodCard(
+              icon: Icons.payments,
+              title: 'Pago en Efectivo',
+              subtitle: 'Al momento de la entrega',
+              isSelected: selectedPaymentMethod == PaymentMethod.cash,
+              onTap: () => setState(() {
+                selectedPaymentMethod = PaymentMethod.cash;
+                showBillingForm = false;
+              }),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentMethodOption(
-    PaymentMethod method,
-    IconData icon,
-    String title,
-    String subtitle,
-  ) {
-    final isSelected = selectedPaymentMethod == method;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedPaymentMethod = method;
-          if (method == PaymentMethod.cash) {
-            showBillingForm = false;
-          }
-        });
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected ? AppTheme.primaryOrange : AppTheme.outline,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-          color: isSelected
-              ? AppTheme.primaryOrange.withValues(alpha: 0.08)
-              : AppTheme.surfaceDark,
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppTheme.primaryOrange
-                    : AppTheme.surfaceVariant,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: isSelected ? Colors.white : AppTheme.onSurfaceVariant,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: AppTheme.primaryOrange,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.check, color: Colors.white, size: 20),
-              ),
           ],
         ),
       ),
@@ -649,27 +544,27 @@ class _PagoScreenState extends State<PagoScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            _buildTextFormField(
+            CustomCheckoutTextField(
               controller: nameController,
               label: 'Nombre Completo',
               icon: Icons.person,
             ),
             const SizedBox(height: 12),
-            _buildTextFormField(
+            CustomCheckoutTextField(
               controller: emailController,
               label: 'Correo Electrónico',
               icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 12),
-            _buildTextFormField(
+            CustomCheckoutTextField(
               controller: phoneController,
               label: 'Teléfono',
               icon: Icons.phone,
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 12),
-            _buildTextFormField(
+            CustomCheckoutTextField(
               controller: addressController,
               label: 'Dirección de Facturación',
               icon: Icons.location_on,
@@ -684,7 +579,7 @@ class _PagoScreenState extends State<PagoScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              _buildTextFormField(
+              CustomCheckoutTextField(
                 controller: cardNumberController,
                 label: 'Número de Tarjeta',
                 icon: Icons.credit_card,
@@ -695,7 +590,7 @@ class _PagoScreenState extends State<PagoScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextFormField(
+                    child: CustomCheckoutTextField(
                       controller: expiryController,
                       label: 'MM/AA',
                       placeholder: '12/25',
@@ -704,7 +599,7 @@ class _PagoScreenState extends State<PagoScreen> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildTextFormField(
+                    child: CustomCheckoutTextField(
                       controller: cvvController,
                       label: 'CVV',
                       placeholder: '123',
@@ -720,31 +615,6 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  Widget _buildTextFormField({
-    required TextEditingController controller,
-    required String label,
-    IconData? icon,
-    String? placeholder,
-    TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: placeholder,
-        prefixIcon: icon != null ? Icon(icon) : null,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppTheme.primaryOrange, width: 2),
-        ),
-      ),
-    );
-  }
-
   Widget _buildSecurityMessage() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -755,13 +625,13 @@ class _PagoScreenState extends State<PagoScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.lock, color: AppTheme.accentGreen, size: 24),
+          const Icon(Icons.lock, color: AppTheme.accentGreen, size: 24),
           const SizedBox(width: 12),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '🔒 Conexión Segura',
                   style: TextStyle(
                     fontSize: 14,
@@ -769,8 +639,8 @@ class _PagoScreenState extends State<PagoScreen> {
                     color: AppTheme.accentGreen,
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
+                SizedBox(height: 4),
+                Text(
                   'Tus datos están protegidos con encriptación SSL de 256 bits. '
                   'Tu información financiera nunca será compartida.',
                   style: TextStyle(
@@ -802,10 +672,10 @@ class _PagoScreenState extends State<PagoScreen> {
           ),
         ),
         child: paymentStatus == PaymentStatus.processing
-            ? Row(
+            ? const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
@@ -813,8 +683,8 @@ class _PagoScreenState extends State<PagoScreen> {
                       strokeWidth: 2,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
+                  SizedBox(width: 12),
+                  Text(
                     'Procesando...',
                     style: TextStyle(
                       fontSize: 16,
@@ -842,9 +712,8 @@ class _PagoScreenState extends State<PagoScreen> {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
-        onPressed: () {
-          setState(() => showTransactionHistory = !showTransactionHistory);
-        },
+        onPressed: () =>
+            setState(() => showTransactionHistory = !showTransactionHistory),
         icon: const Icon(Icons.history),
         label: Text(
           showTransactionHistory
@@ -874,12 +743,10 @@ class _PagoScreenState extends State<PagoScreen> {
             ),
             const SizedBox(height: 16),
             ...transactionHistory.asMap().entries.map((entry) {
-              final index = entry.key;
-              final transaction = entry.value;
               return Column(
                 children: [
-                  _buildTransactionItem(transaction),
-                  if (index < transactionHistory.length - 1)
+                  _buildTransactionItem(entry.value),
+                  if (entry.key < transactionHistory.length - 1)
                     const Divider(height: 16),
                 ],
               );
@@ -963,6 +830,135 @@ class _PagoScreenState extends State<PagoScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CustomCheckoutTextField extends StatelessWidget {
+  const CustomCheckoutTextField({
+    super.key,
+    required this.controller,
+    required this.label,
+    this.icon,
+    this.placeholder,
+    this.keyboardType = TextInputType.text,
+    this.maxLines = 1,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final IconData? icon;
+  final String? placeholder;
+  final TextInputType keyboardType;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: placeholder,
+        prefixIcon: icon != null ? Icon(icon) : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppTheme.primaryOrange, width: 2),
+        ),
+      ),
+    );
+  }
+}
+
+class PaymentMethodCard extends StatelessWidget {
+  const PaymentMethodCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryOrange : AppTheme.outline,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          color: isSelected
+              ? AppTheme.primaryOrange.withValues(alpha: 0.08)
+              : AppTheme.surfaceDark,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppTheme.primaryOrange
+                    : AppTheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? Colors.white : AppTheme.onSurfaceVariant,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            if (isSelected)
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: AppTheme.primaryOrange,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 20),
+              ),
+          ],
+        ),
       ),
     );
   }

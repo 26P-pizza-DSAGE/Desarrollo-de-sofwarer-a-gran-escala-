@@ -1,7 +1,8 @@
-import 'package:dsage/Inicio.dart';
-import 'package:dsage/Registro.dart';
-import 'package:dsage/db/helpers/user.dart';
-import 'package:dsage/models/payment_arguments.dart';
+import 'package:dsage/features/home/screens/home_screen.dart';
+import 'package:dsage/features/signup/screens/registro_screen.dart';
+import 'package:dsage/shared/helpers/user.dart';
+import 'package:dsage/shared/model/payment_arguments.dart';
+import 'package:dsage/shared/model/pizza.dart';
 import 'package:dsage/realizar_pago_del_pedido.dart';
 import 'package:dsage/services/auth_service.dart';
 import 'package:dsage/theme/app_theme.dart';
@@ -49,6 +50,20 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(path: '/home', builder: (context, state) => const InicioScreen()),
     GoRoute(
+      path: '/checkout',
+      builder: (context, state) {
+        final map = state.extra as Map<String, dynamic>? ?? {};
+
+        return PagoScreen(
+          orderId: map['orderId'] as String? ?? '0000',
+          items: map['items'] as List<Pizza>? ?? <Pizza>[],
+          subtotal: map['subtotal'] as double? ?? 0.0,
+          tax: map['tax'] as double? ?? 0.0,
+          shippingCost: map['shippingCost'] as double? ?? 0.0,
+        );
+      },
+    ),
+    GoRoute(
       path: '/payment',
       builder: (context, state) {
         final args = state.extra as PaymentArguments?;
@@ -63,9 +78,7 @@ final GoRouter _router = GoRouter(
           );
         }
 
-        return const Scaffold(
-          body: Center(child: Text('No payment arguments provided.')),
-        );
+        return const Scaffold(body: Center(child: Text('No hay productos.')));
       },
     ),
   ],

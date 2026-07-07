@@ -21,7 +21,6 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
     final ColorScheme cs = theme.colorScheme;
     final double sheetHeight = MediaQuery.of(context).size.height * 0.82;
     final Pizza pizza = widget.pizza;
-    // Precio por unidad (basePrice + toppings) y total con cantidad seleccionada
     final double unitPrice = pizza.copyWith(quantity: 1).totalPrice;
     final double total = pizza.copyWith(quantity: _quantity).totalPrice;
 
@@ -33,7 +32,6 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
       ),
       child: Column(
         children: [
-          // Handle
           Padding(
             padding: const EdgeInsets.only(top: 12, bottom: 4),
             child: Container(
@@ -46,14 +44,12 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
             ),
           ),
 
-          // Contenido desplazable
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Imagen grande
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: SizedBox(
@@ -89,7 +85,6 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Nombre y precio
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -114,7 +109,6 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Descripción
                   Text(
                     pizza.description,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -124,7 +118,6 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Toppings
                   if (pizza.toppings.isNotEmpty) ...[
                     Text(
                       'Ingredientes',
@@ -164,7 +157,6 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
                     const SizedBox(height: 16),
                   ],
 
-                  // Detalles (tamaño y masa)
                   Row(
                     children: [
                       DetailChip(
@@ -184,7 +176,6 @@ class _PizzaDetailSheetState extends State<PizzaDetailSheet> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Selector de cantidad
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

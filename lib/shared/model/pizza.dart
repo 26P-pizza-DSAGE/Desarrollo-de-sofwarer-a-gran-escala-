@@ -1,44 +1,32 @@
-// ─────────────────────────────────────────────────────────────
-// Topping — ingrediente con precio unitario
-// ─────────────────────────────────────────────────────────────
 class Topping {
   final String name;
   final double price;
 
-  /// Descripción corta opcional, p.ej. "50g", "extra picante".
   final String? description;
 
-  const Topping({
-    required this.name,
-    required this.price,
-    this.description,
-  });
+  const Topping({required this.name, required this.price, this.description});
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'price': price,
-        'description': description,
-      };
+    'name': name,
+    'price': price,
+    'description': description,
+  };
 
   factory Topping.fromMap(Map<String, dynamic> map) => Topping(
-        name: map['name'] as String,
-        price: (map['price'] as num).toDouble(),
-        description: map['description'] as String?,
-      );
+    name: map['name'] as String,
+    price: (map['price'] as num).toDouble(),
+    description: map['description'] as String?,
+  );
 
   @override
   String toString() => description != null ? '$name ($description)' : name;
 }
 
-// ─────────────────────────────────────────────────────────────
-// Pizza — modelo universal para catálogo y creaciones custom
-// ─────────────────────────────────────────────────────────────
 class Pizza {
   final String id;
   final String name;
   final String description;
 
-  /// URL de imagen. Puede ser nula en pizzas personalizadas sin foto.
   final String? imageUrl;
 
   final double basePrice;
@@ -48,7 +36,6 @@ class Pizza {
   final bool isCustom;
   final bool isSavedForLater;
 
-  /// Número de unidades; se usa para el cálculo de [totalPrice].
   final int quantity;
 
   const Pizza({
@@ -65,46 +52,41 @@ class Pizza {
     this.quantity = 1,
   });
 
-  // ── Precio total ─────────────────────────────────────────────
-  /// (basePrice + Σ topping.price) × quantity
   double get totalPrice {
-    final double toppingsSum =
-        toppings.fold(0.0, (sum, t) => sum + t.price);
+    final double toppingsSum = toppings.fold(0.0, (sum, t) => sum + t.price);
     return (basePrice + toppingsSum) * quantity;
   }
 
-  // ── Serialización ────────────────────────────────────────────
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'name': name,
-        'description': description,
-        'imageUrl': imageUrl,
-        'basePrice': basePrice,
-        'size': size,
-        'crust': crust,
-        'toppings': toppings.map((t) => t.toMap()).toList(),
-        'isCustom': isCustom,
-        'isSavedForLater': isSavedForLater,
-        'quantity': quantity,
-      };
+    'id': id,
+    'name': name,
+    'description': description,
+    'imageUrl': imageUrl,
+    'basePrice': basePrice,
+    'size': size,
+    'crust': crust,
+    'toppings': toppings.map((t) => t.toMap()).toList(),
+    'isCustom': isCustom,
+    'isSavedForLater': isSavedForLater,
+    'quantity': quantity,
+  };
 
   factory Pizza.fromMap(Map<String, dynamic> map) => Pizza(
-        id: map['id'] as String,
-        name: map['name'] as String,
-        description: map['description'] as String,
-        imageUrl: map['imageUrl'] as String?,
-        basePrice: (map['basePrice'] as num).toDouble(),
-        size: map['size'] as String? ?? 'Mediana',
-        crust: map['crust'] as String? ?? 'Clásica',
-        toppings: (map['toppings'] as List<dynamic>? ?? [])
-            .map((e) => Topping.fromMap(Map<String, dynamic>.from(e as Map)))
-            .toList(),
-        isCustom: map['isCustom'] as bool? ?? false,
-        isSavedForLater: map['isSavedForLater'] as bool? ?? false,
-        quantity: map['quantity'] as int? ?? 1,
-      );
+    id: map['id'] as String,
+    name: map['name'] as String,
+    description: map['description'] as String,
+    imageUrl: map['imageUrl'] as String?,
+    basePrice: (map['basePrice'] as num).toDouble(),
+    size: map['size'] as String? ?? 'Mediana',
+    crust: map['crust'] as String? ?? 'Clásica',
+    toppings: (map['toppings'] as List<dynamic>? ?? [])
+        .map((e) => Topping.fromMap(Map<String, dynamic>.from(e as Map)))
+        .toList(),
+    isCustom: map['isCustom'] as bool? ?? false,
+    isSavedForLater: map['isSavedForLater'] as bool? ?? false,
+    quantity: map['quantity'] as int? ?? 1,
+  );
 
-  // ── Copia ────────────────────────────────────────────────────
   Pizza copyWith({
     String? id,
     String? name,
@@ -117,20 +99,19 @@ class Pizza {
     bool? isCustom,
     bool? isSavedForLater,
     int? quantity,
-  }) =>
-      Pizza(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        description: description ?? this.description,
-        imageUrl: imageUrl ?? this.imageUrl,
-        basePrice: basePrice ?? this.basePrice,
-        size: size ?? this.size,
-        crust: crust ?? this.crust,
-        toppings: toppings ?? this.toppings,
-        isCustom: isCustom ?? this.isCustom,
-        isSavedForLater: isSavedForLater ?? this.isSavedForLater,
-        quantity: quantity ?? this.quantity,
-      );
+  }) => Pizza(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    description: description ?? this.description,
+    imageUrl: imageUrl ?? this.imageUrl,
+    basePrice: basePrice ?? this.basePrice,
+    size: size ?? this.size,
+    crust: crust ?? this.crust,
+    toppings: toppings ?? this.toppings,
+    isCustom: isCustom ?? this.isCustom,
+    isSavedForLater: isSavedForLater ?? this.isSavedForLater,
+    quantity: quantity ?? this.quantity,
+  );
 
   @override
   String toString() =>
@@ -138,7 +119,6 @@ class Pizza {
       'crust: $crust, toppings: $toppings, quantity: $quantity, '
       'totalPrice: ${totalPrice.toStringAsFixed(2)}, isCustom: $isCustom)';
 
-  // ── Catálogo mock ────────────────────────────────────────────
   static const List<Pizza> catalog = [
     Pizza(
       id: 'pepperoni-01',

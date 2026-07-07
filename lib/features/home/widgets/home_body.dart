@@ -23,15 +23,12 @@ class HomeBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Tarjeta de usuario ──────────────────────────────
           UserCard(user: user, theme: theme, cs: cs),
           const SizedBox(height: 24),
 
-          // ── Banner "Personaliza tu pizza" ───────────────────
           CustomizeBanner(theme: theme, cs: cs),
           const SizedBox(height: 28),
 
-          // ── Recomendada del día ──────────────────────────────
           Text(
             'Recomendada del día',
             style: theme.textTheme.titleMedium?.copyWith(
@@ -48,7 +45,6 @@ class HomeBody extends StatelessWidget {
           ),
           const SizedBox(height: 28),
 
-          // ── Pizzas populares ─────────────────────────────────
           Text(
             'Pizzas populares',
             style: theme.textTheme.titleMedium?.copyWith(

@@ -1,10 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:dsage/shared/model/pizza.dart';
 import 'package:dsage/realizar_pago_del_pedido.dart';
-
-/// Ejemplo de cómo usar la pantalla de pago
-///
-/// Este archivo muestra cómo navegar a la pantalla de pago desde otra pantalla
-/// con los parámetros requeridos.
+import 'package:flutter/material.dart';
 
 class EjemploUsoPago extends StatelessWidget {
   const EjemploUsoPago({super.key});
@@ -16,29 +12,24 @@ class EjemploUsoPago extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            // Crear datos de ejemplo
             final itemsPedido = [
-              OrderItem(name: 'Pizza Margarita', price: 12.99, quantity: 2),
-              OrderItem(name: 'Pizza Pepperoni', price: 14.99, quantity: 1),
-              OrderItem(name: 'Coca Cola 2L', price: 3.50, quantity: 2),
-              OrderItem(name: 'Papas Fritas', price: 4.99, quantity: 1),
+              Pizza.catalog[0].copyWith(quantity: 2),
+              Pizza.catalog[1].copyWith(quantity: 1),
             ];
 
-            // Calcular subtotal
-            double subtotal = 0;
-            for (var item in itemsPedido) {
-              subtotal += item.price * item.quantity;
-            }
+            final double subtotal = itemsPedido.fold(
+              0.0,
+              (sum, item) => sum + item.totalPrice,
+            );
 
-            // Navegar a la pantalla de pago
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => PagoScreen(
                   orderId: 'ORD-2024-${DateTime.now().millisecondsSinceEpoch}',
                   items: itemsPedido,
                   subtotal: subtotal,
-                  tax: subtotal * 0.08, // 8% de impuestos
-                  shippingCost: 5.00,
+                  tax: subtotal * 0.08,
+                  shippingCost: 50.00,
                 ),
               ),
             );
@@ -61,78 +52,38 @@ class EjemploUsoPago extends StatelessWidget {
   }
 }
 
-/// Ejemplo de cómo crear órdenes desde una lista de productos
-class ProductoCarrito {
-  final String nombre;
-  final double precio;
-  int cantidad;
-
-  ProductoCarrito({
-    required this.nombre,
-    required this.precio,
-    required this.cantidad,
-  });
-}
-
 class GestorCarrito {
-  final List<ProductoCarrito> _items = [];
+  final List<Pizza> _items = [];
 
-  void agregarProducto(ProductoCarrito producto) {
-    _items.add(producto);
+  void agregarPizza(Pizza pizza) => _items.add(pizza);
+
+  void removerPizza(int index) {
+    if (index >= 0 && index < _items.length) _items.removeAt(index);
   }
 
-  void removerProducto(int index) {
-    if (index >= 0 && index < _items.length) {
-      _items.removeAt(index);
-    }
-  }
+  double obtenerSubtotal() =>
+      _items.fold(0.0, (sum, item) => sum + item.totalPrice);
 
-  double obtenerSubtotal() {
-    double total = 0;
-    for (var item in _items) {
-      total += item.precio * item.cantidad;
-    }
-    return total;
-  }
+  List<Pizza> obtenerItems() => List.unmodifiable(_items);
 
-  List<OrderItem> convertirAOrderItems() {
-    return _items
-        .map(
-          (p) =>
-              OrderItem(name: p.nombre, price: p.precio, quantity: p.cantidad),
-        )
-        .toList();
-  }
-
-  void limpiar() {
-    _items.clear();
-  }
+  void limpiar() => _items.clear();
 }
 
-/// Ejemplo de navegación desde la pantalla de carrito a pago
 void ejemploNavegacionDesdePantallaPrincipal(BuildContext context) {
-  // Crear gestor del carrito
   final carrito = GestorCarrito();
 
-  // Agregar productos (ejemplo)
-  carrito.agregarProducto(
-    ProductoCarrito(nombre: 'Pizza Grande', precio: 18.99, cantidad: 1),
-  );
-  carrito.agregarProducto(
-    ProductoCarrito(nombre: 'Sidra 2L', precio: 4.50, cantidad: 2),
-  );
+  carrito.agregarPizza(Pizza.catalog[2].copyWith(quantity: 1));
+  carrito.agregarPizza(Pizza.catalog[3].copyWith(quantity: 2));
 
-  // Obtener subtotal
   final subtotal = carrito.obtenerSubtotal();
   final impuestos = subtotal * 0.08;
-  final envio = 5.00;
+  const envio = 50.00;
 
-  // Navegar a la pantalla de pago
   Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) => PagoScreen(
         orderId: 'ORD-${DateTime.now().millisecondsSinceEpoch}',
-        items: carrito.convertirAOrderItems(),
+        items: carrito.obtenerItems(),
         subtotal: subtotal,
         tax: impuestos,
         shippingCost: envio,
