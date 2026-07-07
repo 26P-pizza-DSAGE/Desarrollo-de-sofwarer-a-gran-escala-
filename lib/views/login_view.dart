@@ -1,6 +1,7 @@
-import 'package:dsage/db/helpers/user.dart';
+import 'package:dsage/shared/helpers/user.dart';
 import 'package:dsage/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -47,7 +48,7 @@ class _LoginViewState extends State<LoginView> {
 
       await AuthService.saveUserId(user.id!);
       if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      context.go('/home');
     } catch (_) {
       if (!mounted) return;
       setState(
@@ -202,10 +203,7 @@ class _LoginViewState extends State<LoginView> {
                             const SizedBox(height: 14),
 
                             TextButton(
-                              onPressed: () => Navigator.pushReplacementNamed(
-                                context,
-                                '/sign-up',
-                              ),
+                              onPressed: () => context.go('/sign-up'),
                               child: Text.rich(
                                 TextSpan(
                                   text: '¿No tienes cuenta? ',

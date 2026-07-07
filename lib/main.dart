@@ -1,12 +1,15 @@
-import 'package:dsage/Inicio.dart';
-import 'package:dsage/Registro.dart';
-import 'package:dsage/db/helpers/user.dart';
+import 'package:dsage/features/home/screens/home_screen.dart';
+import 'package:dsage/features/signup/screens/registro_screen.dart';
+import 'package:dsage/shared/helpers/user.dart';
+import 'package:dsage/shared/model/payment_arguments.dart';
+import 'package:dsage/shared/model/pizza.dart';
 import 'package:dsage/realizar_pago_del_pedido.dart';
 import 'package:dsage/services/auth_service.dart';
 import 'package:dsage/theme/app_theme.dart';
 import 'package:dsage/views/login_view.dart';
 import 'package:dsage/views/splash_view.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> main() async {
@@ -27,37 +30,56 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Pizza Builder',
       theme: AppTheme.dark,
       debugShowCheckedModeBanner: false,
-      initialRoute: '/payment',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        //'/login': (context) => const LoginView(),
-        '/sign-up': (context) => const RegistroScreen(),
-        '/home': (context) => const InicioScreen(),
-        '/login': (context) {
-          final items = [
-            OrderItem(name: 'Pizza Margarita', price: 12.99, quantity: 2),
-            OrderItem(name: 'Pizza Pepperoni', price: 14.99, quantity: 1),
-            OrderItem(name: 'Coca Cola 2L', price: 3.50, quantity: 2),
-          ];
-
-          final subtotal = items.fold<double>(
-            0,
-            (sum, item) => sum + (item.price * item.quantity),
-          );
-
-          return PagoScreen(
-            orderId: 'ORD-2024-001',
-            items: items,
-            subtotal: subtotal,
-            tax: subtotal * 0.08,
-            shippingCost: 4.99,
-          );
-        },
-      },
+      routerConfig: _router,
     );
   }
 }
+
+final GoRouter _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+    GoRoute(path: '/login', builder: (context, state) => const LoginView()),
+    GoRoute(
+      path: '/sign-up',
+      builder: (context, state) => const RegistroScreen(),
+    ),
+    GoRoute(path: '/home', builder: (context, state) => const InicioScreen()),
+    GoRoute(
+      path: '/checkout',
+      builder: (context, state) {
+        final map = state.extra as Map<String, dynamic>? ?? {};
+
+        return PagoScreen(
+          orderId: map['orderId'] as String? ?? '0000',
+          items: map['items'] as List<Pizza>? ?? <Pizza>[],
+          subtotal: map['subtotal'] as double? ?? 0.0,
+          tax: map['tax'] as double? ?? 0.0,
+          shippingCost: map['shippingCost'] as double? ?? 0.0,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/payment',
+      builder: (context, state) {
+        final args = state.extra as PaymentArguments?;
+
+        if (args != null) {
+          return PagoScreen(
+            orderId: args.orderId,
+            items: args.items,
+            subtotal: args.subtotal,
+            tax: args.tax,
+            shippingCost: args.shippingCost,
+          );
+        }
+
+        return const Scaffold(body: Center(child: Text('No hay productos.')));
+      },
+    ),
+  ],
+);

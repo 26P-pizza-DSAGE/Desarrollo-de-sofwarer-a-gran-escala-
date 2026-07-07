@@ -1,7 +1,8 @@
-import 'package:dsage/db/helpers/user.dart';
-import 'package:dsage/db/model/user.dart';
+import 'package:dsage/shared/helpers/user.dart';
+import 'package:dsage/shared/model/user.dart';
 import 'package:dsage/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class RegistroScreen extends StatefulWidget {
   const RegistroScreen({super.key});
@@ -101,7 +102,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
       await AuthService.saveUserId(newUserId);
       if (!mounted) return;
 
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      context.go('/home');
     } catch (_) {
       if (!mounted) return;
       await _showDialog(
@@ -279,10 +280,7 @@ class _RegistroScreenState extends State<RegistroScreen> {
                             const SizedBox(height: 14),
 
                             TextButton(
-                              onPressed: () => Navigator.pushReplacementNamed(
-                                context,
-                                '/login',
-                              ),
+                              onPressed: () => context.go('/login'),
                               child: Text.rich(
                                 TextSpan(
                                   text: '¿Ya tienes cuenta? ',
