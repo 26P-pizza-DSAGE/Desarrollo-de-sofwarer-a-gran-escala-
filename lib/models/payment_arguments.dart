@@ -1,34 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-// Enums y modelos
-enum PaymentStatus { pending, processing, confirmed, rejected }
-
-enum PaymentMethod { card, cash }
-
-class OrderItem {
-  final String name;
-  final double price;
-  final int quantity;
-
-  OrderItem({required this.name, required this.price, required this.quantity});
-}
-
-class Transaction {
-  final String id;
-  final DateTime date;
-  final double amount;
-  final PaymentStatus status;
-  final PaymentMethod method;
-
-  Transaction({
-    required this.id,
-    required this.date,
-    required this.amount,
-    required this.status,
-    required this.method,
-  });
-}
+import 'package:dsage/realizar_pago_del_pedido.dart';
 
 class PaymentArguments {
   final String orderId;
