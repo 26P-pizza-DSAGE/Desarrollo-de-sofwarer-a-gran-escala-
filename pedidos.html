@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos Recibidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Mono:wght@400;700&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6E9;
+    --paper-alt:#F1E9D2;
+    --ink:#2B2118;
+    --ink-soft:#7a6c58;
+    --tomato:#D6402B;
+    --tomato-dark:#B8321F;
+    --basil:#3F7A47;
+    --squash:#C9781E;
+    --line:rgba(43,33,24,0.18);
+    --shadow:rgba(43,33,24,0.18);
+    --bg:#EFE6CC;
+  }
+  [data-theme="dark"]{
+    --paper:#221C17;
+    --paper-alt:#2C241D;
+    --ink:#F1E7D4;
+    --ink-soft:#b2a189;
+    --tomato:#EA6A4E;
+    --tomato-dark:#D6402B;
+    --basil:#7EC084;
+    --squash:#F0A93F;
+    --line:rgba(241,231,212,0.16);
+    --shadow:rgba(0,0,0,0.55);
+    --bg:#15110D;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:'Libre Franklin', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    transition:background .3s ease, color .3s ease;
+  }
+
+  .marquee{
+    background:var(--tomato);
+    color:#fff;
+    padding:22px 20px 26px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    box-shadow:0 4px 0 var(--tomato-dark);
+    position:relative;
+  }
+  .marquee h1{
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size:clamp(24px,5vw,34px);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin:0;
+  }
+  .marquee .sub{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:1px;
+    opacity:.85;
+    margin-top:4px;
+  }
+  .theme-btn{
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.5);
+    color:#fff;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .2s ease, transform .2s ease;
+    flex-shrink:0;
+  }
+  .theme-btn:hover{ background:rgba(255,255,255,0.28); transform:rotate(15deg); }
+  .theme-btn:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+  .theme-btn svg{ width:20px; height:20px; }
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:26px 16px 60px;
+    display:flex;
+    flex-direction:column;
+    gap:34px;
+  }
+
+  .ticket{
+    position:relative;
+    background:var(--paper);
+    border-radius:6px 6px 2px 2px;
+    box-shadow:0 10px 24px -8px var(--shadow), 0 1px 0 var(--line);
+    padding:20px 22px 26px;
+  }
+  .ticket::before{
+    content:"";
+    position:absolute;
+    top:-9px;
+    left:50%;
+    transform:translateX(-50%);
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:var(--bg);
+    box-shadow:0 0 0 3px var(--paper);
+  }
+  .ticket::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-9px;
+    height:10px;
+    background:
+      linear-gradient(135deg, var(--paper) 25%, transparent 25%) 0 0/16px 16px,
+      linear-gradient(-135deg, var(--paper) 25%, transparent 25%) 0 0/16px 16px;
+    background-color:transparent;
+  }
+
+  .ticket-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .order-no{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size:26px;
+    letter-spacing:1px;
+  }
+  .order-no span{ color:var(--tomato); }
+  .order-time{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    letter-spacing:1px;
+  }
+  .cliente{
+    margin-top:6px;
+    font-weight:600;
+    font-size:15px;
+  }
+
+  .perf{
+    border:none;
+    border-top:2px dashed var(--line);
+    margin:16px 0;
+  }
+
+  .label{
+    font-family:'Oswald', sans-serif;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+  ul.productos{
+    list-style:none;
+    margin:0 0 16px;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  ul.productos li{
+    font-size:15px;
+    display:flex;
+    gap:8px;
+  }
+  ul.productos li::before{
+    content:"–";
+    color:var(--tomato);
+    font-weight:700;
+  }
+
+  .total-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .total-row .label{ margin-bottom:0; }
+  .total-amt{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size:22px;
+  }
+
+  .status-stamp{
+    display:inline-block;
+    font-family:'Oswald', sans-serif;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    padding:5px 12px;
+    border-radius:3px;
+    border:2px solid currentColor;
+    transform:rotate(-3deg);
+    margin-bottom:18px;
+  }
+  .status-pendiente{ color:var(--squash); }
+  .status-confirmado{ color:var(--basil); }
+  .status-rechazado{ color:var(--tomato); }
+
+  .actions{ display:flex; gap:10px; }
+  .btn{
+    flex:1;
+    border:none;
+    border-radius:5px;
+    padding:12px 14px;
+    font-family:'Oswald', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:filter .15s ease, transform .15s ease;
+    color:#fff;
+  }
+  .btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn:focus-visible{ outline:2px solid var(--ink); outline-offset:2px; }
+  .btn-confirm{ background:var(--basil); }
+  .btn-reject{ background:var(--tomato); }
+  .btn-done{
+    width:100%;
+    background:var(--paper-alt);
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    cursor:default;
+  }
+  .btn-done:hover{ filter:none; transform:none; }
+
+  @media (prefers-reduced-motion: reduce){
+    .theme-btn, .btn{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="marquee">
+  <div>
+    <h1>Pedidos Recibidos</h1>
+    <div class="sub">COCINA · MOSTRADOR</div>
+  </div>
+  <button class="theme-btn" id="themeToggle" aria-label="Cambiar tema claro u oscuro">
+    <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+  </button>
+</header>
+
+<main id="ticketList"></main>
+
+<script>
+const sunPath = '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const moonPath = '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>';
+
+let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeIcon').innerHTML = theme === 'dark' ? sunPath : moonPath;
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+});
+
+applyTheme();
+
+const pedidos = [
+  {
+    cliente: "Juan Pérez",
+    numero: 1,
+    hora: "14:35",
+    productos: ["Pepperoni x2", "Hawaiana x1", "Coca-Cola x2"],
+    total: 420,
+    estado: "Pendiente"
+  },
+  {
+    cliente: "María López",
+    numero: 2,
+    hora: "14:40",
+    productos: ["Mexicana x1", "Vegetariana x2"],
+    total: 560,
+    estado: "Confirmado"
+  }
+];
+
+function render(){
+  const list = document.getElementById('ticketList');
+  list.innerHTML = '';
+
+  pedidos.forEach((pedido, idx) => {
+    const ticket = document.createElement('div');
+    ticket.className = 'ticket';
+
+    const estadoClass = 'status-' + pedido.estado.toLowerCase();
+
+    let actionsHtml = '';
+    if (pedido.estado === 'Pendiente') {
+      actionsHtml = `
+        <div class="actions">
+          <button class="btn btn-confirm" data-idx="${idx}" data-action="Confirmado">Confirmar</button>
+          <button class="btn btn-reject" data-idx="${idx}" data-action="Rechazado">Rechazar</button>
+        </div>`;
+    } else {
+      const msg = pedido.estado === 'Confirmado' ? 'Pedido confirmado' : 'Pedido rechazado';
+      actionsHtml = `<button class="btn btn-done" disabled>${msg}</button>`;
+    }
+
+    ticket.innerHTML = `
+      <div class="ticket-head">
+        <div class="order-no">N.º <span>${String(pedido.numero).padStart(3,'0')}</span></div>
+        <div class="order-time">${pedido.hora}</div>
+      </div>
+      <div class="cliente">${pedido.cliente}</div>
+
+      <hr class="perf">
+
+      <div class="label">Productos</div>
+      <ul class="productos">
+        ${pedido.productos.map(p => `<li>${p}</li>`).join('')}
+      </ul>
+
+      <div class="total-row">
+        <div class="label">Total</div>
+        <div class="total-amt">$${pedido.total}</div>
+      </div>
+
+      <div class="status-stamp ${estadoClass}">${pedido.estado}</div>
+      <div>${actionsHtml}</div>
+    `;
+
+    list.appendChild(ticket);
+  });
+
+  document.querySelectorAll('.btn-confirm, .btn-reject').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = e.currentTarget.getAttribute('data-idx');
+      const action = e.currentTarget.getAttribute('data-action');
+      pedidos[idx].estado = action;
+      render();
+    });
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
