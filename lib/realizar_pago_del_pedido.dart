@@ -2,6 +2,7 @@ import 'package:dsage/shared/model/pizza.dart';
 import 'package:dsage/core/config/app_constants.dart';
 import 'package:dsage/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 enum PaymentStatus { pending, processing, confirmed, rejected }
@@ -285,14 +286,13 @@ class _PagoScreenState extends State<PagoScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
               _downloadInvoice();
             },
             child: const Text('Descargar Factura'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushNamed(context, '/tracking');
               _goToDeliveryTracking();
             },
             child: const Text('Seguimiento de Entrega'),

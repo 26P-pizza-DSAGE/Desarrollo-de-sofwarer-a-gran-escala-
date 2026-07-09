@@ -1,22 +1,15 @@
+import 'package:dsage/core/config/app_constants.dart';
+import 'package:dsage/shared/model/payment_arguments.dart';
+import 'package:dsage/shared/model/pizza.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-void main() {
-  runApp(const PizzaApp());
-}
-
-class PizzaApp extends StatelessWidget {
-  const PizzaApp({super.key});
+class CustomOrderScreen extends StatelessWidget {
+  const CustomOrderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Arma tu Pizza',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
-      home: const TamanoScreen(),
-    );
+    return const TamanoScreen();
   }
 }
 
@@ -32,26 +25,10 @@ class _TamanoScreenState extends State<TamanoScreen> {
   double precioSeleccionado = 12.90;
 
   final List<Map<String, dynamic>> tamanos = [
-    {
-      'nombre': 'Personal',
-      'descripcion': '20 cm · 1-2 pax',
-      'precio': 8.90,
-    },
-    {
-      'nombre': 'Mediana',
-      'descripcion': '28 cm · 2-3 pax',
-      'precio': 12.90,
-    },
-    {
-      'nombre': 'Grande',
-      'descripcion': '33 cm · 3-4 pax',
-      'precio': 16.90,
-    },
-    {
-      'nombre': 'Familiar',
-      'descripcion': '40 cm · 4-6 pax',
-      'precio': 21.90,
-    },
+    {'nombre': 'Personal', 'descripcion': '20 cm · 1-2 pax', 'precio': 8.90},
+    {'nombre': 'Mediana', 'descripcion': '28 cm · 2-3 pax', 'precio': 12.90},
+    {'nombre': 'Grande', 'descripcion': '33 cm · 3-4 pax', 'precio': 16.90},
+    {'nombre': 'Familiar', 'descripcion': '40 cm · 4-6 pax', 'precio': 21.90},
   ];
 
   @override
@@ -64,10 +41,7 @@ class _TamanoScreenState extends State<TamanoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Encabezado(
-                titulo: 'Arma tu Pizza',
-                paso: 'Tamaño',
-              ),
+              const Encabezado(titulo: 'Arma tu Pizza', paso: 'Tamaño'),
 
               const SizedBox(height: 18),
 
@@ -75,9 +49,7 @@ class _TamanoScreenState extends State<TamanoScreen> {
 
               const SizedBox(height: 35),
 
-              const Center(
-                child: PizzaPreview(),
-              ),
+              const Center(child: PizzaPreview()),
 
               const SizedBox(height: 30),
 
@@ -86,8 +58,7 @@ class _TamanoScreenState extends State<TamanoScreen> {
                   itemCount: tamanos.length,
                   itemBuilder: (context, index) {
                     final item = tamanos[index];
-                    final seleccionado =
-                        item['nombre'] == tamanoSeleccionado;
+                    final seleccionado = item['nombre'] == tamanoSeleccionado;
 
                     return TarjetaTamano(
                       nombre: item['nombre'],
@@ -106,19 +77,19 @@ class _TamanoScreenState extends State<TamanoScreen> {
               ),
 
               BotonContinuar(
-            texto: 'Continuar',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MasaScreen(
-          tamano: tamanoSeleccionado,
-          precioTamano: precioSeleccionado,
-        ),
-      ),
-    );
-  },
-),
+                texto: 'Continuar',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MasaScreen(
+                        tamano: tamanoSeleccionado,
+                        precioTamano: precioSeleccionado,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -131,11 +102,7 @@ class Encabezado extends StatelessWidget {
   final String titulo;
   final String paso;
 
-  const Encabezado({
-    super.key,
-    required this.titulo,
-    required this.paso,
-  });
+  const Encabezado({super.key, required this.titulo, required this.paso});
 
   @override
   Widget build(BuildContext context) {
@@ -155,10 +122,7 @@ class Encabezado extends StatelessWidget {
             ),
             Text(
               paso,
-              style: const TextStyle(
-                color: Color(0xFFC48A5A),
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Color(0xFFC48A5A), fontSize: 14),
             ),
           ],
         ),
@@ -167,14 +131,9 @@ class Encabezado extends StatelessWidget {
           height: 48,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: const Color(0xFF6B3A0A),
-            ),
+            border: Border.all(color: const Color(0xFF6B3A0A)),
           ),
-          child: const Icon(
-            Icons.shopping_cart_outlined,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
         ),
       ],
     );
@@ -184,10 +143,7 @@ class Encabezado extends StatelessWidget {
 class BarraProgreso extends StatelessWidget {
   final int pasoActual;
 
-  const BarraProgreso({
-    super.key,
-    required this.pasoActual,
-  });
+  const BarraProgreso({super.key, required this.pasoActual});
 
   @override
   Widget build(BuildContext context) {
@@ -200,9 +156,7 @@ class BarraProgreso extends StatelessWidget {
             margin: const EdgeInsets.only(right: 6),
             height: 7,
             decoration: BoxDecoration(
-              color: activo
-                  ? const Color(0xFFFFA51E)
-                  : const Color(0xFF4A250C),
+              color: activo ? const Color(0xFFFFA51E) : const Color(0xFF4A250C),
               borderRadius: BorderRadius.circular(20),
             ),
           ),
@@ -231,10 +185,7 @@ class PizzaPreview extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: const Color(0xFFF2C2A5),
-            border: Border.all(
-              color: const Color(0xFFD64332),
-              width: 10,
-            ),
+            border: Border.all(color: const Color(0xFFD64332), width: 10),
           ),
         ),
       ),
@@ -277,10 +228,7 @@ class TarjetaTamano extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Text(
-              '🍕',
-              style: TextStyle(fontSize: 34),
-            ),
+            const Text('🍕', style: TextStyle(fontSize: 34)),
 
             const SizedBox(width: 18),
 
@@ -319,10 +267,7 @@ class TarjetaTamano extends StatelessWidget {
 
             if (seleccionado) ...[
               const SizedBox(width: 12),
-              const Icon(
-                Icons.check,
-                color: Color(0xFFFFA51E),
-              ),
+              const Icon(Icons.check, color: Color(0xFFFFA51E)),
             ],
           ],
         ),
@@ -335,11 +280,7 @@ class BotonContinuar extends StatelessWidget {
   final String texto;
   final VoidCallback onTap;
 
-  const BotonContinuar({
-    super.key,
-    required this.texto,
-    required this.onTap,
-  });
+  const BotonContinuar({super.key, required this.texto, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -362,10 +303,7 @@ class BotonContinuar extends StatelessWidget {
           children: [
             Text(
               texto,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
             ),
             const SizedBox(width: 12),
             const Icon(Icons.arrow_forward_ios, size: 16),
@@ -395,11 +333,7 @@ class _MasaScreenState extends State<MasaScreen> {
   double precioMasa = 0;
 
   final List<Map<String, dynamic>> masas = [
-    {
-      'nombre': 'Delgada',
-      'descripcion': 'Crujiente y ligera',
-      'precio': 0.0,
-    },
+    {'nombre': 'Delgada', 'descripcion': 'Crujiente y ligera', 'precio': 0.0},
     {
       'nombre': 'Clásica',
       'descripcion': 'El equilibrio perfecto',
@@ -427,10 +361,7 @@ class _MasaScreenState extends State<MasaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Encabezado(
-                titulo: 'Arma tu Pizza',
-                paso: 'Masa',
-              ),
+              const Encabezado(titulo: 'Arma tu Pizza', paso: 'Masa'),
 
               const SizedBox(height: 18),
 
@@ -438,9 +369,7 @@ class _MasaScreenState extends State<MasaScreen> {
 
               const SizedBox(height: 35),
 
-              const Center(
-                child: PizzaPreview(),
-              ),
+              const Center(child: PizzaPreview()),
 
               const SizedBox(height: 30),
 
@@ -455,8 +384,7 @@ class _MasaScreenState extends State<MasaScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final item = masas[index];
-                    final seleccionado =
-                        item['nombre'] == masaSeleccionada;
+                    final seleccionado = item['nombre'] == masaSeleccionada;
 
                     return TarjetaOpcionCuadro(
                       icono: '◌',
@@ -488,20 +416,20 @@ class _MasaScreenState extends State<MasaScreen> {
                   Expanded(
                     child: BotonContinuar(
                       texto: 'Continuar',
-                        onTap: () {
-                         Navigator.push(
-                            context,
-                              MaterialPageRoute(
-                                builder: (context) => SalsaScreen(
-                                  tamano: widget.tamano,
-                                    precioTamano: widget.precioTamano,
-                                      masa: masaSeleccionada,
-                                       precioMasa: precioMasa,
-        ),
-      ),
-    );
-  },
-),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SalsaScreen(
+                              tamano: widget.tamano,
+                              precioTamano: widget.precioTamano,
+                              masa: masaSeleccionada,
+                              precioMasa: precioMasa,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -512,6 +440,7 @@ class _MasaScreenState extends State<MasaScreen> {
     );
   }
 }
+
 class TarjetaOpcionCuadro extends StatelessWidget {
   final String icono;
   final String nombre;
@@ -605,10 +534,7 @@ class TarjetaOpcionCuadro extends StatelessWidget {
 class BotonAtras extends StatelessWidget {
   final VoidCallback onTap;
 
-  const BotonAtras({
-    super.key,
-    required this.onTap,
-  });
+  const BotonAtras({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -618,10 +544,7 @@ class BotonAtras extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(
-            color: Color(0xFF6B3A0A),
-            width: 1.5,
-          ),
+          side: const BorderSide(color: Color(0xFF6B3A0A), width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -694,10 +617,7 @@ class _SalsaScreenState extends State<SalsaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Encabezado(
-                titulo: 'Arma tu Pizza',
-                paso: 'Salsa',
-              ),
+              const Encabezado(titulo: 'Arma tu Pizza', paso: 'Salsa'),
 
               const SizedBox(height: 18),
 
@@ -705,9 +625,7 @@ class _SalsaScreenState extends State<SalsaScreen> {
 
               const SizedBox(height: 35),
 
-              const Center(
-                child: PizzaPreview(),
-              ),
+              const Center(child: PizzaPreview()),
 
               const SizedBox(height: 30),
 
@@ -722,8 +640,7 @@ class _SalsaScreenState extends State<SalsaScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final item = salsas[index];
-                    final seleccionado =
-                        item['nombre'] == salsaSeleccionada;
+                    final seleccionado = item['nombre'] == salsaSeleccionada;
 
                     return TarjetaOpcionCuadro(
                       icono: item['icono'],
@@ -753,22 +670,22 @@ class _SalsaScreenState extends State<SalsaScreen> {
 
                   Expanded(
                     child: BotonContinuar(
-  texto: 'Continuar',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QuesoScreen(
-          tamano: widget.tamano,
-          precioTamano: widget.precioTamano,
-          masa: widget.masa,
-          precioMasa: widget.precioMasa,
-          salsa: salsaSeleccionada,
-        ),
-      ),
-    );
-  },
-),
+                      texto: 'Continuar',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuesoScreen(
+                              tamano: widget.tamano,
+                              precioTamano: widget.precioTamano,
+                              masa: widget.masa,
+                              precioMasa: widget.precioMasa,
+                              salsa: salsaSeleccionada,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -779,6 +696,7 @@ class _SalsaScreenState extends State<SalsaScreen> {
     );
   }
 }
+
 class QuesoScreen extends StatefulWidget {
   final String tamano;
   final double precioTamano;
@@ -839,10 +757,7 @@ class _QuesoScreenState extends State<QuesoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Encabezado(
-                titulo: 'Arma tu Pizza',
-                paso: 'Queso',
-              ),
+              const Encabezado(titulo: 'Arma tu Pizza', paso: 'Queso'),
 
               const SizedBox(height: 18),
 
@@ -850,9 +765,7 @@ class _QuesoScreenState extends State<QuesoScreen> {
 
               const SizedBox(height: 35),
 
-              const Center(
-                child: PizzaPreview(),
-              ),
+              const Center(child: PizzaPreview()),
 
               const SizedBox(height: 30),
 
@@ -867,8 +780,7 @@ class _QuesoScreenState extends State<QuesoScreen> {
                   ),
                   itemBuilder: (context, index) {
                     final item = quesos[index];
-                    final seleccionado =
-                        item['nombre'] == quesoSeleccionado;
+                    final seleccionado = item['nombre'] == quesoSeleccionado;
 
                     return TarjetaOpcionCuadro(
                       icono: item['icono'],
@@ -898,23 +810,23 @@ class _QuesoScreenState extends State<QuesoScreen> {
 
                   Expanded(
                     child: BotonContinuar(
-  texto: 'Continuar',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ToppingsScreen(
-          tamano: widget.tamano,
-          precioTamano: widget.precioTamano,
-          masa: widget.masa,
-          precioMasa: widget.precioMasa,
-          salsa: widget.salsa,
-          queso: quesoSeleccionado,
-        ),
-      ),
-    );
-  },
-),
+                      texto: 'Continuar',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ToppingsScreen(
+                              tamano: widget.tamano,
+                              precioTamano: widget.precioTamano,
+                              masa: widget.masa,
+                              precioMasa: widget.precioMasa,
+                              salsa: widget.salsa,
+                              queso: quesoSeleccionado,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -925,6 +837,7 @@ class _QuesoScreenState extends State<QuesoScreen> {
     );
   }
 }
+
 class ToppingsScreen extends StatefulWidget {
   final String tamano;
   final double precioTamano;
@@ -951,66 +864,18 @@ class _ToppingsScreenState extends State<ToppingsScreen> {
   final List<Map<String, dynamic>> toppingsSeleccionados = [];
 
   final List<Map<String, dynamic>> toppings = [
-    {
-      'nombre': 'Pepperoni',
-      'icono': '🍖',
-      'precio': 1.50,
-    },
-    {
-      'nombre': 'Champiñones',
-      'icono': '🍄',
-      'precio': 1.00,
-    },
-    {
-      'nombre': 'Aceitunas',
-      'icono': '🫒',
-      'precio': 1.00,
-    },
-    {
-      'nombre': 'Pimientos',
-      'icono': '🫑',
-      'precio': 1.00,
-    },
-    {
-      'nombre': 'Cebolla',
-      'icono': '🧅',
-      'precio': 0.80,
-    },
-    {
-      'nombre': 'Bacon',
-      'icono': '🥓',
-      'precio': 1.50,
-    },
-    {
-      'nombre': 'Espinaca',
-      'icono': '🥬',
-      'precio': 0.80,
-    },
-    {
-      'nombre': 'Piña',
-      'icono': '🍍',
-      'precio': 1.00,
-    },
-    {
-      'nombre': 'Anchoas',
-      'icono': '🐟',
-      'precio': 1.50,
-    },
-    {
-      'nombre': 'Jalapeño',
-      'icono': '🌶️',
-      'precio': 1.00,
-    },
-    {
-      'nombre': 'Maíz',
-      'icono': '🌽',
-      'precio': 0.80,
-    },
-    {
-      'nombre': 'Prosciutto',
-      'icono': '🥩',
-      'precio': 2.00,
-    },
+    {'nombre': 'Pepperoni', 'icono': '🍖', 'precio': 1.50},
+    {'nombre': 'Champiñones', 'icono': '🍄', 'precio': 1.00},
+    {'nombre': 'Aceitunas', 'icono': '🫒', 'precio': 1.00},
+    {'nombre': 'Pimientos', 'icono': '🫑', 'precio': 1.00},
+    {'nombre': 'Cebolla', 'icono': '🧅', 'precio': 0.80},
+    {'nombre': 'Bacon', 'icono': '🥓', 'precio': 1.50},
+    {'nombre': 'Espinaca', 'icono': '🥬', 'precio': 0.80},
+    {'nombre': 'Piña', 'icono': '🍍', 'precio': 1.00},
+    {'nombre': 'Anchoas', 'icono': '🐟', 'precio': 1.50},
+    {'nombre': 'Jalapeño', 'icono': '🌶️', 'precio': 1.00},
+    {'nombre': 'Maíz', 'icono': '🌽', 'precio': 0.80},
+    {'nombre': 'Prosciutto', 'icono': '🥩', 'precio': 2.00},
   ];
 
   bool estaSeleccionado(String nombre) {
@@ -1049,10 +914,7 @@ class _ToppingsScreenState extends State<ToppingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Encabezado(
-                titulo: 'Arma tu Pizza',
-                paso: 'Toppings',
-              ),
+              const Encabezado(titulo: 'Arma tu Pizza', paso: 'Toppings'),
 
               const SizedBox(height: 18),
 
@@ -1060,9 +922,7 @@ class _ToppingsScreenState extends State<ToppingsScreen> {
 
               const SizedBox(height: 25),
 
-              const Center(
-                child: PizzaPreview(),
-              ),
+              const Center(child: PizzaPreview()),
 
               const SizedBox(height: 18),
 
@@ -1116,24 +976,24 @@ class _ToppingsScreenState extends State<ToppingsScreen> {
 
                   Expanded(
                     child: BotonContinuar(
-  texto: 'Revisar pedido',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PedidoScreen(
-          tamano: widget.tamano,
-          precioTamano: widget.precioTamano,
-          masa: widget.masa,
-          precioMasa: widget.precioMasa,
-          salsa: widget.salsa,
-          queso: widget.queso,
-          toppings: toppingsSeleccionados,
-        ),
-      ),
-    );
-  },
-),
+                      texto: 'Revisar pedido',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PedidoScreen(
+                              tamano: widget.tamano,
+                              precioTamano: widget.precioTamano,
+                              masa: widget.masa,
+                              precioMasa: widget.precioMasa,
+                              salsa: widget.salsa,
+                              queso: widget.queso,
+                              toppings: toppingsSeleccionados,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -1144,6 +1004,7 @@ class _ToppingsScreenState extends State<ToppingsScreen> {
     );
   }
 }
+
 class TarjetaTopping extends StatelessWidget {
   final String icono;
   final String nombre;
@@ -1179,12 +1040,7 @@ class TarjetaTopping extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              icono,
-              style: const TextStyle(
-                fontSize: 27,
-              ),
-            ),
+            Text(icono, style: const TextStyle(fontSize: 27)),
 
             const SizedBox(height: 8),
 
@@ -1225,6 +1081,7 @@ class TarjetaTopping extends StatelessWidget {
     );
   }
 }
+
 class PedidoScreen extends StatefulWidget {
   final String tamano;
   final double precioTamano;
@@ -1274,10 +1131,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Encabezado(
-                titulo: 'Arma tu Pizza',
-                paso: 'Pedido',
-              ),
+              const Encabezado(titulo: 'Arma tu Pizza', paso: 'Pedido'),
 
               const SizedBox(height: 18),
 
@@ -1293,9 +1147,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFF351A0B),
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: const Color(0xFF6B3A0A),
-                        ),
+                        border: Border.all(color: const Color(0xFF6B3A0A)),
                       ),
                       child: Column(
                         children: [
@@ -1324,10 +1176,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
                             emoji: '🧀',
                           ),
 
-                          const Divider(
-                            color: Color(0xFF6B3A0A),
-                            height: 28,
-                          ),
+                          const Divider(color: Color(0xFF6B3A0A), height: 28),
 
                           Align(
                             alignment: Alignment.centerLeft,
@@ -1387,10 +1236,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
                               );
                             }),
 
-                          const Divider(
-                            color: Color(0xFF6B3A0A),
-                            height: 28,
-                          ),
+                          const Divider(color: Color(0xFF6B3A0A), height: 28),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1424,9 +1270,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFF351A0B),
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: const Color(0xFF6B3A0A),
-                        ),
+                        border: Border.all(color: const Color(0xFF6B3A0A)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1447,7 +1291,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
                               Expanded(
                                 child: BotonEntrega(
                                   texto: 'Delivery',
-                                  icono: '🛵',
+                                  icono: Icons.delivery_dining_outlined,
                                   seleccionado: tipoEntrega == 'Delivery',
                                   onTap: () {
                                     setState(() {
@@ -1462,7 +1306,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
                               Expanded(
                                 child: BotonEntrega(
                                   texto: 'Recoger',
-                                  icono: '🏪',
+                                  icono: Icons.storefront_outlined,
                                   seleccionado: tipoEntrega == 'Recoger',
                                   onTap: () {
                                     setState(() {
@@ -1495,11 +1339,41 @@ class _PedidoScreenState extends State<PedidoScreen> {
                       height: 58,
                       child: ElevatedButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Pedido confirmado: $tipoEntrega - \$${total.toStringAsFixed(2)}',
-                              ),
+                          final items = [
+                            Pizza(
+                              id: 'custom-${DateTime.now().millisecondsSinceEpoch}',
+                              name: 'Pizza personalizada',
+                              description:
+                                  '${widget.tamano} · ${widget.masa} · ${widget.salsa} · ${widget.queso}',
+                              basePrice: total,
+                              size: widget.tamano,
+                              crust: widget.masa,
+                              toppings: widget.toppings
+                                  .map(
+                                    (topping) => Topping(
+                                      name: topping['nombre'] as String,
+                                      price: (topping['precio'] as num)
+                                          .toDouble(),
+                                      description: topping['icono'] as String?,
+                                    ),
+                                  )
+                                  .toList(),
+                              isCustom: true,
+                            ),
+                          ];
+                          final subtotal = items.first.totalPrice;
+                          final tax = subtotal * AppConstants.taxRate;
+                          final shipping = AppConstants.baseShippingCost;
+
+                          context.push(
+                            '/payment',
+                            extra: PaymentArguments(
+                              orderId:
+                                  'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+                              items: items,
+                              subtotal: subtotal,
+                              tax: tax,
+                              shippingCost: shipping,
                             ),
                           );
                         },
@@ -1531,6 +1405,7 @@ class _PedidoScreenState extends State<PedidoScreen> {
     );
   }
 }
+
 class FilaResumen extends StatelessWidget {
   final String titulo;
   final String valor;
@@ -1555,10 +1430,7 @@ class FilaResumen extends StatelessWidget {
             width: 90,
             child: Text(
               titulo,
-              style: const TextStyle(
-                color: Color(0xFFC48A5A),
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Color(0xFFC48A5A), fontSize: 14),
             ),
           ),
 
@@ -1593,7 +1465,7 @@ class FilaResumen extends StatelessWidget {
 
 class BotonEntrega extends StatelessWidget {
   final String texto;
-  final String icono;
+  final IconData icono;
   final bool seleccionado;
   final VoidCallback onTap;
 
@@ -1624,15 +1496,29 @@ class BotonEntrega extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Text(
-            '$icono  $texto',
-            style: TextStyle(
-              color: seleccionado
-                  ? const Color(0xFFFFA51E)
-                  : const Color(0xFFC48A5A),
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icono,
+                color: seleccionado
+                    ? const Color(0xFFFFA51E)
+                    : const Color(0xFFC48A5A),
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                texto,
+                style: TextStyle(
+                  color: seleccionado
+                      ? const Color(0xFFFFA51E)
+                      : const Color(0xFFC48A5A),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
           ),
         ),
       ),

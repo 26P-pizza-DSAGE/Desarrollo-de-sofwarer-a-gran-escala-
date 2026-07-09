@@ -1,3 +1,4 @@
+import 'package:dsage/features/custom/screens/custom_order.dart';
 import 'package:dsage/features/home/screens/home_screen.dart';
 import 'package:dsage/features/auth/screens/registro_screen.dart';
 import 'package:dsage/shared/helpers/user.dart';
@@ -62,6 +63,10 @@ final GoRouter _router = GoRouter(
           shippingCost: map['shippingCost'] as double? ?? 0.0,
         );
       },
+    ),
+    GoRoute(
+      path: '/customize',
+      builder: (context, state) => const CustomOrderScreen(),
     ),
     GoRoute(
       path: '/payment',
