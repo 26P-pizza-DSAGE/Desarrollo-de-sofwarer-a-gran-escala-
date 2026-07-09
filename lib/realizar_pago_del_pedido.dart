@@ -2,6 +2,7 @@ import 'package:dsage/shared/model/pizza.dart';
 import 'package:dsage/core/config/app_constants.dart';
 import 'package:dsage/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 enum PaymentStatus { pending, processing, confirmed, rejected }
@@ -257,7 +258,7 @@ class _PagoScreenState extends State<PagoScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('¡Pago Confirmado!'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -285,15 +286,16 @@ class _PagoScreenState extends State<PagoScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(dialogContext, rootNavigator: true).pop();
               _downloadInvoice();
+              context.go('/home');
             },
             child: const Text('Descargar Factura'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              _goToDeliveryTracking();
+              Navigator.of(dialogContext, rootNavigator: true).pop();
+              context.go('/tracking', extra: widget.orderId);
             },
             child: const Text('Seguimiento de Entrega'),
           ),
@@ -307,14 +309,8 @@ class _PagoScreenState extends State<PagoScreen> {
       SnackBar(
         content: const Text('Descargando factura...'),
         action: SnackBarAction(label: 'OK', onPressed: () {}),
+        backgroundColor: AppTheme.primaryOrange,
       ),
-    );
-  }
-
-  void _goToDeliveryTracking() {
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Ir a seguimiento de entrega')),
     );
   }
 

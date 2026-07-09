@@ -58,7 +58,7 @@ class CustomizeBanner extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: () => context.go('/crear'),
+                    onPressed: () => context.go('/customize'),
                     child: const Text(
                       'Personalizar',
                       style: TextStyle(fontWeight: FontWeight.w800),
