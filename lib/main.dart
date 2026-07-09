@@ -9,6 +9,7 @@ import 'package:dsage/services/auth_service.dart';
 import 'package:dsage/theme/app_theme.dart';
 import 'package:dsage/views/login_view.dart';
 import 'package:dsage/views/splash_view.dart';
+import 'package:dsage/views/tracking_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -69,6 +70,11 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const CustomOrderScreen(),
     ),
     GoRoute(
+      path: '/tracking',
+      builder: (context, state) =>
+          const Scaffold(body: Center(child: Text('Seguimiento de Entrega'))),
+    ),
+    GoRoute(
       path: '/payment',
       builder: (context, state) {
         final args = state.extra as PaymentArguments?;
@@ -84,6 +90,13 @@ final GoRouter _router = GoRouter(
         }
 
         return const Scaffold(body: Center(child: Text('No hay productos.')));
+      },
+    ),
+    GoRoute(
+      path: '/tracking',
+      builder: (context, state) {
+        final orderId = state.extra as String?;
+        return TrackingView(orderId: orderId);
       },
     ),
   ],
