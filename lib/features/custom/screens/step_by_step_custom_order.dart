@@ -538,7 +538,7 @@ class _SalsaScreenState extends State<SalsaScreen> {
     );
   }
 }
-class QuesoScreen extends StatelessWidget {
+class QuesoScreen extends StatefulWidget {
   final String tamano;
   final double precioTamano;
   final String masa;
@@ -557,18 +557,133 @@ class QuesoScreen extends StatelessWidget {
   });
 
   @override
+  State<QuesoScreen> createState() => _QuesoScreenState();
+}
+
+class _QuesoScreenState extends State<QuesoScreen> {
+  String quesoSeleccionado = 'Mozzarella';
+  double precioQueso = 0;
+
+  final List<Map<String, dynamic>> quesos = [
+    {
+      'nombre': 'Mozzarella',
+      'descripcion': 'Clásico y fundido',
+      'precio': 0.0,
+      'icono': '🧀',
+    },
+    {
+      'nombre': 'Cheddar',
+      'descripcion': 'Sabor fuerte',
+      'precio': 0.75,
+      'icono': '🧀',
+    },
+    {
+      'nombre': 'Parmesano',
+      'descripcion': 'Toque italiano',
+      'precio': 1.00,
+      'icono': '🧀',
+    },
+    {
+      'nombre': 'Extra queso',
+      'descripcion': 'Más cremoso',
+      'precio': 1.50,
+      'icono': '🧀',
+    },
+  ];
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF241006),
       body: SafeArea(
-        child: Center(
-          child: Text(
-            'Queso para $tamano con salsa $salsa',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Encabezado(
+                titulo: 'Arma tu Pizza',
+                paso: 'Queso',
+              ),
+
+              const SizedBox(height: 18),
+
+              const BarraProgreso(pasoActual: 4),
+
+              const SizedBox(height: 35),
+
+              const Center(
+                child: PizzaPreview(),
+              ),
+
+              const SizedBox(height: 30),
+
+              Expanded(
+                child: GridView.builder(
+                  itemCount: quesos.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 1.05,
+                  ),
+                  itemBuilder: (context, index) {
+                    final item = quesos[index];
+                    final seleccionado =
+                        item['nombre'] == quesoSeleccionado;
+
+                    return TarjetaOpcionCuadro(
+                      icono: item['icono'],
+                      nombre: item['nombre'],
+                      descripcion: item['descripcion'],
+                      precio: item['precio'],
+                      seleccionado: seleccionado,
+                      onTap: () {
+                        setState(() {
+                          quesoSeleccionado = item['nombre'];
+                          precioQueso = item['precio'];
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+
+              Row(
+                children: [
+                  BotonAtras(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+
+                  const SizedBox(width: 14),
+
+                  Expanded(
+                    child: BotonContinuar(
+                      texto: 'Continuar',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ToppingsScreen(
+                              tamano: widget.tamano,
+                              precioTamano: widget.precioTamano,
+                              masa: widget.masa,
+                              precioMasa: widget.precioMasa,
+                              salsa: widget.salsa,
+                              precioSalsa: widget.precioSalsa,
+                              queso: quesoSeleccionado,
+                              precioQueso: precioQueso,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
@@ -693,6 +808,47 @@ class BotonAtras extends StatelessWidget {
           Icons.arrow_back_ios_new,
           color: Color(0xFFC48A5A),
           size: 18,
+        ),
+      ),
+    );
+  }
+}
+class ToppingsScreen extends StatelessWidget {
+  final String tamano;
+  final double precioTamano;
+  final String masa;
+  final double precioMasa;
+  final String salsa;
+  final double precioSalsa;
+  final String queso;
+  final double precioQueso;
+
+  const ToppingsScreen({
+    super.key,
+    required this.tamano,
+    required this.precioTamano,
+    required this.masa,
+    required this.precioMasa,
+    required this.salsa,
+    required this.precioSalsa,
+    required this.queso,
+    required this.precioQueso,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF241006),
+      body: SafeArea(
+        child: Center(
+          child: Text(
+            'Toppings para $tamano con queso $queso',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );
