@@ -24,7 +24,7 @@ class EjemploUsoPago extends StatelessWidget {
 
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => PagoScreen(
+                builder: (context) => PantallaPago(
                   orderId: 'ORD-2024-${DateTime.now().millisecondsSinceEpoch}',
                   items: itemsPedido,
                   subtotal: subtotal,
@@ -81,7 +81,7 @@ void ejemploNavegacionDesdePantallaPrincipal(BuildContext context) {
 
   Navigator.of(context).push(
     MaterialPageRoute(
-      builder: (context) => PagoScreen(
+      builder: (context) => PantallaPago(
         orderId: 'ORD-${DateTime.now().millisecondsSinceEpoch}',
         items: carrito.obtenerItems(),
         subtotal: subtotal,
