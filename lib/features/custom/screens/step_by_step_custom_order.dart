@@ -624,39 +624,7 @@ class BotonAtras extends StatelessWidget {
     );
   }
 }
-class SalsaScreen extends StatelessWidget {
-  final String tamano;
-  final double precioTamano;
-  final String masa;
-  final double precioMasa;
 
-  const SalsaScreen({
-    super.key,
-    required this.tamano,
-    required this.precioTamano,
-    required this.masa,
-    required this.precioMasa,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF241006),
-      body: SafeArea(
-        child: Center(
-          child: Text(
-            'Salsa para $tamano con masa $masa',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 class SalsaScreen extends StatefulWidget {
   final String tamano;
   final double precioTamano;
@@ -955,130 +923,8 @@ class _QuesoScreenState extends State<QuesoScreen> {
     );
   }
 }
-class TarjetaOpcionCuadro extends StatelessWidget {
-  final String icono;
-  final String nombre;
-  final String descripcion;
-  final double precio;
-  final bool seleccionado;
-  final VoidCallback onTap;
 
-  const TarjetaOpcionCuadro({
-    super.key,
-    required this.icono,
-    required this.nombre,
-    required this.descripcion,
-    required this.precio,
-    required this.seleccionado,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF351A0B),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: seleccionado
-                ? const Color(0xFFFFA51E)
-                : const Color(0xFF6B3A0A),
-            width: seleccionado ? 2 : 1.3,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              icono,
-              style: TextStyle(
-                color: seleccionado
-                    ? const Color(0xFFFFA51E)
-                    : const Color(0xFFD9A85E),
-                fontSize: 42,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            Text(
-              nombre,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              descripcion,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Color(0xFFC48A5A),
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            if (precio > 0) ...[
-              const SizedBox(height: 8),
-              Text(
-                '+\$${precio.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  color: Color(0xFFFFA51E),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class BotonAtras extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const BotonAtras({
-    super.key,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 56,
-      height: 56,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(
-            color: Color(0xFF6B3A0A),
-            width: 1.5,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: const Icon(
-          Icons.arrow_back_ios_new,
-          color: Color(0xFFC48A5A),
-          size: 18,
-        ),
-      ),
-    );
-  }
-}
-class ToppingsScreen extends StatelessWidget {
+class ToppingsScreen extends StatefulWidget {
   final String tamano;
   final double precioTamano;
   final String masa;
@@ -1101,17 +947,325 @@ class ToppingsScreen extends StatelessWidget {
   });
 
   @override
+  State<ToppingsScreen> createState() => _ToppingsScreenState();
+}
+
+class _ToppingsScreenState extends State<ToppingsScreen> {
+  final List<String> toppingsSeleccionados = [];
+
+  final List<Map<String, dynamic>> toppings = [
+    {
+      'nombre': 'Pepperoni',
+      'descripcion': 'Clásico y crujiente',
+      'precio': 1.50,
+      'icono': '🍕',
+    },
+    {
+      'nombre': 'Champiñones',
+      'descripcion': 'Frescos y suaves',
+      'precio': 1.00,
+      'icono': '🍄',
+    },
+    {
+      'nombre': 'Jamón',
+      'descripcion': 'Sabor tradicional',
+      'precio': 1.25,
+      'icono': '🥓',
+    },
+    {
+      'nombre': 'Piña',
+      'descripcion': 'Dulce y tropical',
+      'precio': 1.00,
+      'icono': '🍍',
+    },
+    {
+      'nombre': 'Aceitunas',
+      'descripcion': 'Toque mediterráneo',
+      'precio': 0.75,
+      'icono': '🫒',
+    },
+    {
+      'nombre': 'Cebolla',
+      'descripcion': 'Crujiente y aromática',
+      'precio': 0.75,
+      'icono': '🧅',
+    },
+  ];
+
+  double get precioToppings {
+    double total = 0;
+
+    for (final topping in toppings) {
+      if (toppingsSeleccionados.contains(topping['nombre'])) {
+        total += topping['precio'];
+      }
+    }
+
+    return total;
+  }
+
+  void cambiarSeleccion(String nombre) {
+    setState(() {
+      if (toppingsSeleccionados.contains(nombre)) {
+        toppingsSeleccionados.remove(nombre);
+      } else {
+        toppingsSeleccionados.add(nombre);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF241006),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Encabezado(
+                titulo: 'Arma tu Pizza',
+                paso: 'Ingredientes',
+              ),
+
+              const SizedBox(height: 18),
+
+              const BarraProgreso(pasoActual: 5),
+
+              const SizedBox(height: 25),
+
+              const Center(
+                child: PizzaPreview(),
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                'Selecciona tus toppings',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 19,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                '${toppingsSeleccionados.length} seleccionados · +\$${precioToppings.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(0xFFC48A5A),
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              Expanded(
+                child: ListView.builder(
+                  itemCount: toppings.length,
+                  itemBuilder: (context, index) {
+                    final item = toppings[index];
+                    final seleccionado =
+                        toppingsSeleccionados.contains(item['nombre']);
+
+                    return TarjetaTopping(
+                      icono: item['icono'],
+                      nombre: item['nombre'],
+                      descripcion: item['descripcion'],
+                      precio: item['precio'],
+                      seleccionado: seleccionado,
+                      onTap: () {
+                        cambiarSeleccion(item['nombre']);
+                      },
+                    );
+                  },
+                ),
+              ),
+
+              Row(
+                children: [
+                  BotonAtras(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+
+                  const SizedBox(width: 14),
+
+                  Expanded(
+                    child: BotonContinuar(
+                      texto: 'Continuar',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PedidoScreen(
+                              tamano: widget.tamano,
+                              precioTamano: widget.precioTamano,
+                              masa: widget.masa,
+                              precioMasa: widget.precioMasa,
+                              salsa: widget.salsa,
+                              precioSalsa: widget.precioSalsa,
+                              queso: widget.queso,
+                              precioQueso: widget.precioQueso,
+                              toppings: toppingsSeleccionados,
+                              precioToppings: precioToppings,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+class TarjetaTopping extends StatelessWidget {
+  final String icono;
+  final String nombre;
+  final String descripcion;
+  final double precio;
+  final bool seleccionado;
+  final VoidCallback onTap;
+
+  const TarjetaTopping({
+    super.key,
+    required this.icono,
+    required this.nombre,
+    required this.descripcion,
+    required this.precio,
+    required this.seleccionado,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF351A0B),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: seleccionado
+                ? const Color(0xFFFFA51E)
+                : const Color(0xFF6B3A0A),
+            width: seleccionado ? 2 : 1.3,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              icono,
+              style: const TextStyle(fontSize: 32),
+            ),
+
+            const SizedBox(width: 16),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    nombre,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    descripcion,
+                    style: const TextStyle(
+                      color: Color(0xFFC48A5A),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Text(
+              '+\$${precio.toStringAsFixed(2)}',
+              style: const TextStyle(
+                color: Color(0xFFFFA51E),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            Icon(
+              seleccionado
+                  ? Icons.check_circle
+                  : Icons.radio_button_unchecked,
+              color: seleccionado
+                  ? const Color(0xFFFFA51E)
+                  : const Color(0xFFC48A5A),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class PedidoScreen extends StatelessWidget {
+  final String tamano;
+  final double precioTamano;
+  final String masa;
+  final double precioMasa;
+  final String salsa;
+  final double precioSalsa;
+  final String queso;
+  final double precioQueso;
+  final List<String> toppings;
+  final double precioToppings;
+
+  const PedidoScreen({
+    super.key,
+    required this.tamano,
+    required this.precioTamano,
+    required this.masa,
+    required this.precioMasa,
+    required this.salsa,
+    required this.precioSalsa,
+    required this.queso,
+    required this.precioQueso,
+    required this.toppings,
+    required this.precioToppings,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final total = precioTamano +
+        precioMasa +
+        precioSalsa +
+        precioQueso +
+        precioToppings;
+
     return Scaffold(
       backgroundColor: const Color(0xFF241006),
       body: SafeArea(
         child: Center(
           child: Text(
-            'Toppings para $tamano con queso $queso',
+            'Resumen · Total: \$${total.toStringAsFixed(2)}',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
             ),
           ),
         ),
