@@ -363,7 +363,7 @@ class BotonContinuar extends StatelessWidget {
     );
   }
 }
-class MasaScreen extends StatelessWidget {
+class MasaScreen extends StatefulWidget {
   final String tamano;
   final double precioTamano;
 
@@ -374,13 +374,278 @@ class MasaScreen extends StatelessWidget {
   });
 
   @override
+  State<MasaScreen> createState() => _MasaScreenState();
+}
+
+class _MasaScreenState extends State<MasaScreen> {
+  String masaSeleccionada = 'Clásica';
+  double precioMasa = 0;
+
+  final List<Map<String, dynamic>> masas = [
+    {
+      'nombre': 'Delgada',
+      'descripcion': 'Crujiente y ligera',
+      'precio': 0.0,
+    },
+    {
+      'nombre': 'Clásica',
+      'descripcion': 'El equilibrio perfecto',
+      'precio': 0.0,
+    },
+    {
+      'nombre': 'Rellena',
+      'descripcion': 'Con queso en el borde',
+      'precio': 1.50,
+    },
+    {
+      'nombre': 'Focaccia',
+      'descripcion': 'Esponjosa y aromática',
+      'precio': 1.50,
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF241006),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Encabezado(
+                titulo: 'Arma tu Pizza',
+                paso: 'Masa',
+              ),
+
+              const SizedBox(height: 18),
+
+              const BarraProgreso(pasoActual: 2),
+
+              const SizedBox(height: 35),
+
+              const Center(
+                child: PizzaPreview(),
+              ),
+
+              const SizedBox(height: 30),
+
+              Expanded(
+                child: GridView.builder(
+                  itemCount: masas.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 1.05,
+                  ),
+                  itemBuilder: (context, index) {
+                    final item = masas[index];
+                    final seleccionado = item['nombre'] == masaSeleccionada;
+
+                    return TarjetaOpcionCuadro(
+                      icono: '◌',
+                      nombre: item['nombre'],
+                      descripcion: item['descripcion'],
+                      precio: item['precio'],
+                      seleccionado: seleccionado,
+                      onTap: () {
+                        setState(() {
+                          masaSeleccionada = item['nombre'];
+                          precioMasa = item['precio'];
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+
+              Row(
+                children: [
+                  BotonAtras(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+
+                  const SizedBox(width: 14),
+
+                  Expanded(
+                    child: BotonContinuar(
+                      texto: 'Continuar',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SalsaScreen(
+                              tamano: widget.tamano,
+                              precioTamano: widget.precioTamano,
+                              masa: masaSeleccionada,
+                              precioMasa: precioMasa,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+ 
+
+class TarjetaOpcionCuadro extends StatelessWidget {
+  final String icono;
+  final String nombre;
+  final String descripcion;
+  final double precio;
+  final bool seleccionado;
+  final VoidCallback onTap;
+
+  const TarjetaOpcionCuadro({
+    super.key,
+    required this.icono,
+    required this.nombre,
+    required this.descripcion,
+    required this.precio,
+    required this.seleccionado,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF351A0B),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: seleccionado
+                ? const Color(0xFFFFA51E)
+                : const Color(0xFF6B3A0A),
+            width: seleccionado ? 2 : 1.3,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              icono,
+              style: TextStyle(
+                color: seleccionado
+                    ? const Color(0xFFFFA51E)
+                    : const Color(0xFFD9A85E),
+                fontSize: 42,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            Text(
+              nombre,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              descripcion,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFFC48A5A),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            if (precio > 0) ...[
+              const SizedBox(height: 8),
+              Text(
+                '+\$${precio.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Color(0xFFFFA51E),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class BotonAtras extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const BotonAtras({
+    super.key,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 56,
+      height: 56,
+      child: OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(
+            color: Color(0xFF6B3A0A),
+            width: 1.5,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Icon(
+          Icons.arrow_back_ios_new,
+          color: Color(0xFFC48A5A),
+          size: 18,
+        ),
+      ),
+    );
+  }
+}
+class SalsaScreen extends StatelessWidget {
+  final String tamano;
+  final double precioTamano;
+  final String masa;
+  final double precioMasa;
+
+  const SalsaScreen({
+    super.key,
+    required this.tamano,
+    required this.precioTamano,
+    required this.masa,
+    required this.precioMasa,
+  });
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF241006),
       body: SafeArea(
         child: Center(
           child: Text(
-            'Masa para $tamano - \$${precioTamano.toStringAsFixed(2)}',
+            'Salsa para $tamano con masa $masa',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
