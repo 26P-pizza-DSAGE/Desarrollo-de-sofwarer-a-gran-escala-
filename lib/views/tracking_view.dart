@@ -9,11 +9,13 @@ class TrackingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Seguimiento de Entrega'),
-        backgroundColor: AppTheme.primaryOrange,
+        backgroundColor: AppTheme.surfaceDark,
         elevation: 0,
       ),
       body: Center(

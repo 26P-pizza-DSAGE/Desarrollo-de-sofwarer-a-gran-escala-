@@ -71,8 +71,7 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: '/tracking',
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Seguimiento de Entrega'))),
+      builder: (context, state) => const TrackingView(),
     ),
     GoRoute(
       path: '/payment',
