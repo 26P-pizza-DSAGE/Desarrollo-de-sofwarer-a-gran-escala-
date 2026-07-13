@@ -1,63 +1,136 @@
 import 'package:dsage/shared/helpers/user.dart';
+import 'package:dsage/shared/model/user.dart';
 import 'package:dsage/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class RegistroScreen extends StatefulWidget {
+  const RegistroScreen({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<RegistroScreen> createState() => _RegistroScreenState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _RegistroScreenState extends State<RegistroScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final RegExp _emailRegExp = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
+  bool _attemptedSubmit = false;
   bool _isSubmitting = false;
-  String? _errorMessage;
+  bool _isFormValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.addListener(_onFormChanged);
+    _emailController.addListener(_onFormChanged);
+    _passwordController.addListener(_onFormChanged);
+  }
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _login() async {
+  String? _validateUsername(String? value) {
+    final String v = (value ?? '').trim();
+    if (v.isEmpty) return 'Ingresa tu nombre de usuario';
+    if (v.length < 3) return 'Debe tener al menos 3 caracteres';
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    final String v = (value ?? '').trim();
+    if (v.isEmpty) return 'Ingresa tu correo electrónico';
+    if (!_emailRegExp.hasMatch(v)) return 'Correo electrónico no válido';
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    final String v = value ?? '';
+    if (v.isEmpty) return 'Ingresa tu contraseña';
+    if (v.length < 6) return 'Debe tener al menos 6 caracteres';
+    return null;
+  }
+
+  void _onFormChanged() {
+    final bool next =
+        _validateUsername(_usernameController.text) == null &&
+        _validateEmail(_emailController.text) == null &&
+        _validatePassword(_passwordController.text) == null;
+    if (_isFormValid != next) setState(() => _isFormValid = next);
+  }
+
+  Future<void> _submitRegistration() async {
     FocusScope.of(context).unfocus();
-    setState(() => _errorMessage = null);
+    setState(() => _attemptedSubmit = true);
 
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    if (_isSubmitting) return;
-
+    if (!(_formKey.currentState?.validate() ?? false) || _isSubmitting) return;
     setState(() => _isSubmitting = true);
 
     try {
-      final user = UserRepository.instance.getUserByEmail(
-        _emailController.text.trim().toLowerCase(),
-      );
+      final String email = _emailController.text.trim().toLowerCase();
 
+      final existingUser = UserRepository.instance.getUserByEmail(email);
       if (!mounted) return;
 
-      if (user == null || user.password != _passwordController.text) {
-        setState(() => _errorMessage = 'Correo o contraseña incorrectos.');
+      if (existingUser != null) {
+        await _showDialog(
+          title: 'Correo en uso',
+          content:
+              'Ya existe una cuenta con ese correo. Inicia sesión o usa otro.',
+        );
         return;
       }
 
-      await AuthService.saveUserId(user.id!);
+      final int newUserId = await UserRepository.instance.insertUser(
+        User(
+          username: _usernameController.text.trim(),
+          role: Role.user,
+          email: email,
+          password: _passwordController.text,
+        ),
+      );
+
+      await AuthService.saveUserId(newUserId);
       if (!mounted) return;
+
       context.go('/home');
     } catch (_) {
       if (!mounted) return;
-      setState(
-        () =>
-            _errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.',
+      await _showDialog(
+        title: 'Error al registrarse',
+        content: 'No fue posible crear tu cuenta. Inténtalo nuevamente.',
       );
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+
+  Future<void> _showDialog({
+    required String title,
+    required String content,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -88,7 +161,7 @@ class _LoginViewState extends State<LoginView> {
                     Icon(Icons.local_pizza, size: 80, color: cs.primary),
                     const SizedBox(height: 14),
                     Text(
-                      '¡Bienvenido a Pizza Builder!',
+                      '¡Únete a Pizza Builder!',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w900,
@@ -98,7 +171,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Tu pizza perfecta, a un clic de distancia',
+                      'Crea tu cuenta y empieza a pedir ahora',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: cs.onSurfaceVariant,
@@ -124,11 +197,14 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       child: Form(
                         key: _formKey,
+                        autovalidateMode: _attemptedSubmit
+                            ? AutovalidateMode.onUserInteraction
+                            : AutovalidateMode.disabled,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              'Inicia sesión',
+                              'Crea tu perfil',
                               style: theme.textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.w800,
                                 color: cs.onSurface,
@@ -136,7 +212,7 @@ class _LoginViewState extends State<LoginView> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Ingresa tus credenciales para continuar',
+                              'Completa tus datos para comenzar',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: cs.onSurfaceVariant,
                               ),
@@ -145,6 +221,16 @@ class _LoginViewState extends State<LoginView> {
                             const SizedBox(height: 24),
 
                             TextFormField(
+                              controller: _usernameController,
+                              textInputAction: TextInputAction.next,
+                              decoration: const InputDecoration(
+                                labelText: 'Nombre de usuario',
+                                prefixIcon: Icon(Icons.person_outline),
+                              ),
+                              validator: _validateUsername,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
@@ -152,13 +238,9 @@ class _LoginViewState extends State<LoginView> {
                                 labelText: 'Correo electrónico',
                                 prefixIcon: Icon(Icons.email_outlined),
                               ),
-                              validator: (v) => (v ?? '').trim().isEmpty
-                                  ? 'Ingresa tu correo electrónico'
-                                  : null,
+                              validator: _validateEmail,
                             ),
-
                             const SizedBox(height: 16),
-
                             TextFormField(
                               controller: _passwordController,
                               obscureText: true,
@@ -167,23 +249,18 @@ class _LoginViewState extends State<LoginView> {
                                 labelText: 'Contraseña',
                                 prefixIcon: Icon(Icons.lock_outline),
                               ),
-                              validator: (v) => (v ?? '').isEmpty
-                                  ? 'Ingresa tu contraseña'
-                                  : null,
-                              onFieldSubmitted: (_) => _login(),
+                              validator: _validatePassword,
+                              onFieldSubmitted: (_) => _submitRegistration(),
                             ),
-
-                            if (_errorMessage != null) ...[
-                              const SizedBox(height: 12),
-                              _ErrorBanner(message: _errorMessage!),
-                            ],
 
                             const SizedBox(height: 28),
 
                             SizedBox(
                               height: 56,
                               child: ElevatedButton(
-                                onPressed: _isSubmitting ? null : _login,
+                                onPressed: (!_isFormValid || _isSubmitting)
+                                    ? null
+                                    : _submitRegistration,
                                 child: _isSubmitting
                                     ? SizedBox(
                                         height: 22,
@@ -196,23 +273,23 @@ class _LoginViewState extends State<LoginView> {
                                               ),
                                         ),
                                       )
-                                    : const Text('Iniciar Sesión'),
+                                    : const Text('Registrarse'),
                               ),
                             ),
 
                             const SizedBox(height: 14),
 
                             TextButton(
-                              onPressed: () => context.go('/sign-up'),
+                              onPressed: () => context.go('/login'),
                               child: Text.rich(
                                 TextSpan(
-                                  text: '¿No tienes cuenta? ',
+                                  text: '¿Ya tienes cuenta? ',
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: cs.onSurfaceVariant,
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: 'Regístrate aquí',
+                                      text: 'Inicia sesión aquí',
                                       style: TextStyle(
                                         color: cs.primary,
                                         fontWeight: FontWeight.w700,
@@ -232,38 +309,6 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _ErrorBanner extends StatelessWidget {
-  const _ErrorBanner({required this.message});
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: cs.error.withAlpha(30),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.error.withAlpha(80)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.error_outline, color: cs.error, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: cs.error),
-            ),
-          ),
-        ],
       ),
     );
   }
