@@ -56,7 +56,7 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final map = state.extra as Map<String, dynamic>? ?? {};
 
-        return PagoScreen(
+        return PantallaPago(
           orderId: map['orderId'] as String? ?? '0000',
           items: map['items'] as List<Pizza>? ?? <Pizza>[],
           subtotal: map['subtotal'] as double? ?? 0.0,
@@ -80,7 +80,7 @@ final GoRouter _router = GoRouter(
         final args = state.extra as PaymentArguments?;
 
         if (args != null) {
-          return PagoScreen(
+          return PantallaPago(
             orderId: args.orderId,
             items: args.items,
             subtotal: args.subtotal,
