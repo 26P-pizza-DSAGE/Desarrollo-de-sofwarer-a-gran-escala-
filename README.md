@@ -1,35 +1,17 @@
-# dsage
+# pizza
 
-Aplicación Flutter en desarrollo.
+A new Flutter project.
 
-## Descripción
+## Getting Started
 
-Este proyecto es una base para una app multiplataforma creada con Flutter.
-Actualmente incluye una pantalla de registro.
+This project is a starting point for a Flutter application.
 
-## Estructura principal
+A few resources to get you started if this is your first Flutter project:
 
-- `lib/main.dart`: punto de entrada de la aplicación.
-- `lib/Registro.dart`: pantalla de registro.
-- `android/`, `ios/`, `web/`, `windows/`, `linux/`, `macos/`: soportes por plataforma.
+- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
+- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
-## Requisitos
-
-- Flutter instalado.
-- Un dispositivo o emulador disponible.
-
-## Ejecución
-
-1. Instala dependencias.
-
-	```bash
-	flutter pub get
-	```
-
-2. Ejecuta la aplicación.
-
-	```bash
-	flutter run
-	```
-
-
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
